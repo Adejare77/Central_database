@@ -1,0 +1,85 @@
+
+.auth-block{
+    /* background-color: rgb(227, 240, 240); */
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    font-family: Arial, Helvetica, sans-serif;
+}
+
+h1 {
+    font-weight: 400;
+}
+.form-wrapper{
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+
+.form-wrapper > p{
+    margin-top: 10px;
+}
+
+.form-container {
+    
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    flex-direction: column;
+    gap: 10px;
+    border: 2.5px solid darkgray;
+    border-radius: 25px;
+    width: 500px;
+    padding: 50px;
+    
+}
+
+
+.form-field{
+    display: flex;
+    gap: 20px;
+    flex-direction: row;
+    justify-content: space-between;
+}
+
+/* .form-field > label{
+    width: 250px;
+} */
+
+ /* TODO: Import font style; */
+ 
+ .field-tag{
+     width: 250px;
+     font-weight: bold;
+    }
+    
+    
+.remember-me{
+    display:flex;
+    flex-direction: row;
+    justify-content: flex-start;
+    width: 150px;
+    /* align-content: flex-start; */
+    
+}
+
+.form-wrapper > p{
+    margin-top: 10px;
+}
+
+.remember-me > input{
+    width: 50px;
+}
+
+.remember-me > label{
+    color: grey;
+    font-weight: lighter;
+    font-size: small;
+}
+
+input{
+    width: 100%
+}
+
+

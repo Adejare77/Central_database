@@ -1,4 +1,4 @@
-from datetime import datetime
+from datetime import datetime, timezone
 from hashlib import md5
 from app import login
 from werkzeug.security import generate_password_hash, check_password_hash
