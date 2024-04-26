@@ -3,11 +3,11 @@
 {% block content %}
 <div class="auth-block">
 
-    <h1>Sign In</h1>
     <div class="form-wrapper">
-
+        
         <form class="form-container" action="" method="post" novalidate>
             {{ form.hidden_tag() }}
+            <h1>Sign In</h1>
             <div class="form-field">
                 {{ form.username.label(class_='field-tag') }}
                 {{ form.username(size=32) }}<br>
@@ -24,11 +24,11 @@
             </div>
             <div class="remember-me">
                 {{ form.remember_me()  }}
-                {{ form.remember_me.label(class_='field-tag') }}
+                {{ form.remember_me.label }}
             </div>
             <div>{{ form.submit() }}</div>
+            <p>New User? <a href="{{ url_for('register') }}">Create an Account!</a></p>
         </form>
-        <p>New User? <a href="{{ url_for('register') }}">Click to Register!</a></p>
    
     </div>
 </div>
