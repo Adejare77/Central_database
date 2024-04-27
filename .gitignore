@@ -1,5 +1,12 @@
+<<<<<<< HEAD
 __pycache__/
 venv/
 projenv/
 *.pyc
 new-venv/
+=======
+__pycache__
+venv
+*.pyc
+app.db
+>>>>>>> zeez-b
