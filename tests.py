@@ -19,13 +19,13 @@ class UserModelCase(unittest.TestCase):
         self.app_context.pop()
 
     def test_password_hashing(self):
-        u = User(username='susan', email='susan@example.com')
-        u.set_password('cat')
-        self.assertFalse(u.check_password('dog'))
-        self.assertTrue(u.check_password('cat'))
+        u = User(username='zeezbaba', email='bossman@gmail.com')
+        u.set_password('king')
+        self.assertFalse(u.check_password('queen'))
+        self.assertTrue(u.check_password('king'))
 
     def test_avatar(self):
-        u = User(username='john', email='john@example.com')
+        u = User(username='zeezbaba', email='bossman@gmail.com')
         self.assertEqual(u.avatar(128), ('https://www.gravatar.com/avatar/'
                                          'd4c74594d841139328695756648b6bd6'
                                          '?d=identicon&s=128'))
