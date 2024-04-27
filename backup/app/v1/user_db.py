@@ -1,7 +1,6 @@
 #!/usr/bin/python3
 from sqlalchemy import create_engine
 from sqlalchemy.orm import sessionmaker
-from sqlalchemy.exc import NoResultFound
 from app.v1.central_db_tables import Primary_owner, Other_users
 from sqlalchemy.ext.automap import automap_base
 from os import getenv
@@ -21,11 +20,10 @@ class Database:
 
     @property
     def get_user(self):
-        try:
-            owner = self.session.query(Primary_owner.username).filter_by(username=self.user).one()
+        owner = self.session.query(Primary_owner.username).filter_by(username=self.user).one()
+        if owner:
             return Primary_owner
-        except NoResultFound as e:
-            return Other_users
+        return Other_users
 
     @property
     def get_fmt_db_list(self): # Returns {'fmt1': [db1, db2], 'fmt2': [db3]}
@@ -47,28 +45,14 @@ class Database:
         self.db = db
         return self.db
 
-    def get_permissions(self, db):
-        if self.is_owner == Primary_owner:
-            return ['ALL']
-        permissions = self.session.query(Other_users.permissions).filter_by(username=self.user).one()
-        # permissions[0] converts sqlalchemy instance to dict
-        operations = permissions[0][db]
-        return operations
 
-    @property
-    def get_db_list(self):
-        db_list = self.get_fmt_db_list
-        db_list = [db for db in [db_list for db_list in self.get_fmt_db_list.values()]]
-        db_list = [db for dbs in self.get_fmt_db_list.values() for db in dbs]
-        return db_list
-
-
-class CreateClassTable(Database):
+class CreateClassTable:
     def __init__(self, username, db) -> None:
-        super().__init__(username)
+        self.user = username
         self.db = db
-        self.get_fmt_db = self.db  # returns a dict of {fmt: db}
-        for fmt in self.get_fmt_db.keys():
+        obj = Database(self.user)
+        obj.get_fmt_db = self.db  # returns a dict of {fmt: db}
+        for fmt in obj.get_fmt_db.keys():
             self.fmt = fmt
         url = "{}://{}:{}@localhost:3306/{}".format(self.fmt,
             getenv("USER"), getenv("SECRET_KEY"), self.db)
@@ -91,14 +75,10 @@ class CreateClassTable(Database):
 
     def get_tb_columns(self, tb) -> list:
         # where table is sqlalchemy instance
-        tb_cls = self.get_tbl_cls
-        if type(tb) == str:
-            for tables in tb_cls.keys():
-                if tables == tb:
-                    tb = tb_cls[tables]
         tb_name = tb.__table__
         tb_columns = tb.__table__.columns.keys()
         return [f"{tb_name}.{tb_col}" for tb_col in tb_columns]
+
 
     def close_db(self):
         self.session.close()

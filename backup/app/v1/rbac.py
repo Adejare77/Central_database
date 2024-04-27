@@ -46,10 +46,7 @@ class Filter(CreateClassTable):
             for row in query:
                 for each_table in row:
                     columns = self.get_tb_columns(each_table)
-                    print("---------------------------------")
                     columns = [col.split(".")[-1] for col in columns]
-                    print(columns)
-                    print("===========================================")
                     for col in columns:
                         column_data = getattr(each_table, col)
                         print(column_data, end="\t\t")
@@ -61,18 +58,15 @@ class Filter(CreateClassTable):
             tb = self.get_tbl_cls[self.tb[0]]
             for row in query:
                 for col in self.cols:
-                    if row.__table__ == col.split(".")[0]:
-                        column_data = getattr(row, col.split(".")[0])
-                        print(column_data, end="\t\t")
+                    column_data = getattr(row, col)
+                    print(column_data, end="\t\t")
                 print()
         else:
             for row in query:
                 for each_table in row:
-                    if each_table.__table__ == self.cols[0].split(".")[0]:
                     for col in self.cols:
-                        if each_table.__table__ == col.split(".")[0]:
-                            column_data = getattr(each_table, col)
-                            print(column_data, end="\t\t")
+                        column_data = getattr(each_table, col)
+                        print(column_data, end="\t\t")
                 print("")
         print("")
 
@@ -96,3 +90,39 @@ class Filter(CreateClassTable):
                         column_headers.append(col)
 
         return column_headers
+
+
+
+    # def header(self, table_name=[], columns="all"):
+    #     classes = Create_Class(self.db, self.format, table_name).get_classes
+    #     query = self.session.query(*classes)
+
+    #     if len(classes) > 1:
+    #         for i in range(1, len(table_name)):
+    #             query = query.join(classes[i])
+
+    #     rows = query.all()
+
+    #     table_headers = []
+    #     first_row_tables = rows[0]
+    #     if len(table_name) == 1:
+    #         table_name = rows[0].__table__
+    #         table_columns = rows[0].__table__.columns.keys()
+    #         table_headers.extend([f"{table_name}.{col}" for col in table_columns])
+
+    #     else:
+    #         for tables in first_row_tables:
+    #             table_name = tables.__table__
+    #             table_columns = tables.__table__.columns.keys()
+    #             table_headers.extend([f"{table_name}.{col}" for col in table_columns])
+
+    #     if columns == "all":
+    #         return table_headers, table_columns  # Returns tuple of table.columns, columns
+
+    #     given_table_headers = []
+    #     for column in columns:
+    #         val = [cols for cols in table_headers if column == cols.split(".")[1]]
+    #         given_table_headers.extend(val)
+
+    #     return given_table_headers
+
