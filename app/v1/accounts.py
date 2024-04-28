@@ -1,13 +1,13 @@
-from sqlalchemy import create_engine
-from sqlalchemy.orm import sessionmaker
+#!/usr/bin/env python3
+
 from app.v1.central_db_tables import Primary_owner, Other_users
-from app.v1.user_db import CreateClassTable, Database
+from app.v1.filters import Filter
 
-
-class Account(Database):
-    def __init__(self, username) -> None:
-        super().__init__(username)
-
+class Account(Filter):
+    def __init__(self, username, db, tables, columns=None) -> None:
+        super().__init__(username, db)
+        self.tables = tables
+        self.columns = columns
 
     @property
     def other_users(self):
@@ -19,7 +19,11 @@ class Account(Database):
         pass
 
     @property
-    def get_permissions(self):
+    def permissions(self):
+        {
+            "READ": self.all_rows(self.tables, self.columns),
+            "DELETE": self.all_rows(self.tables, self.columns)
+        }
         if self.is_owner == Primary_owner:
             return ['ALL']
         permissions = self.session.query(Other_users.permissions).filter_by(username=self.user).one()

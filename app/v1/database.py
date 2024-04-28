@@ -89,16 +89,15 @@ class CreateClassTable(Database):
         tables = list(self.get_tbl_cls.keys())
         return tables
 
-    def get_tb_columns(self, tb) -> list:
-        # where table is sqlalchemy instance
+    def get_tb_columns(self, tables=[]) -> list:
         tb_cls = self.get_tbl_cls
-        if type(tb) == str:
-            for tables in tb_cls.keys():
-                if tables == tb:
-                    tb = tb_cls[tables]
-        tb_name = tb.__table__
-        tb_columns = tb.__table__.columns.keys()
-        return [f"{tb_name}.{tb_col}" for tb_col in tb_columns]
+        tb = [tb_cls[tbs] for tbs in tb_cls.keys() if tbs in tables]
+        columns = []
+        for _cls in tb:
+            tb_name = _cls.__table__
+            tb_cols = _cls.__table__.columns.keys()
+            columns.extend(f"{tb_name}.{tb_col}" for tb_col in tb_cols)
+        return columns
 
     def close_db(self):
         self.session.close()
