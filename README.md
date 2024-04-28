@@ -1,10 +1,12 @@
 # RSA - A Central Database Hosting Service
+<!-- TODO: INCLUDE DESCRIPTION OF PROJECT WITH IMAGES -->
+
 
 ## The Team
 
 - **Stephanie Olulesho** "https://github.com/stephieo"
-- **Azeez Okeleji**
-- **Adejare Rasheed**
+- **Azeez Okeleji** "https://github.com/Zeezbaba"
+- **Adejare Rasheed** "https://github.com/Adejare77"
 
 ## Technologies Used
 

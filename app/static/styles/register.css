@@ -77,7 +77,8 @@ h1 {
 }
 
 .form-field input:focus{
-    outline: solid 2px rgba(163, 194, 235, 0.466)
+    outline: solid 2px rgba(163, 194, 235, 0.466);
+    
 }
 
 .field-tag{

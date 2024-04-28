@@ -1,6 +1,33 @@
 {% extends "base.html" %}
 
 {% block content %}
-    <h1>Hi, {{ current_user.username }}!</h1>
-    <!-- TODO: DATABASE DASHBOARD GOES HERE -->
+<!-- TODO: DATABASE DASHBOARD GOES HERE -->
+<nav class="sidebar">
+    <div class="sidebar-container">
+        <div class="home-button">
+            <a href="{{ url_for('index') }}">
+                <span class="material-symbols-outlined">dashboard</span>
+                <span class="company-name">RSA Database</span>
+            </a>
+        </div>
+        <h5>Hi, {{ current_user.username }}!</h5>
+            <ul class="menu-items">
+                <li>
+                    <a href="{{ url_for('user', username=current_user.username)}}">
+                        <span class="material-symbols-outlined">account_circle</span>
+                        <span class="button-name">Account</span>
+                    </a>
+                </li>
+                <li>
+                    <a href="{{ url_for('logout')}}">
+                        <span class="material-symbols-outlined">logout</span>
+                        <span class="button-name">Logout</span>
+                    </a>
+                </li>
+            </ul>
+        </div>
+    </nav>
 {% endblock %}
+
+<!-- sidebar div = div for each menu item  -->
+
