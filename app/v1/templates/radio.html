@@ -1,0 +1,13 @@
+{% extends "base.html" %}
+
+{% block content %}
+    <form action="/selected_db" method="POST">
+        <dl>
+            <dt>Please select a Database</dt>
+            {% for item in data %}
+            <dd><input type="radio" name="db" value="{{ item }}"><label>{{ item }}</label></dd>
+            {% endfor %}
+        </dl>
+        <button type="submit" name="submit">Submit</button>
+    </form>
+{% endblock %}

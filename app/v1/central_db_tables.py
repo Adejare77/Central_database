@@ -22,7 +22,7 @@ class Primary_owner(Base):
     id = Column(Integer, primary_key=True, autoincrement=True)
     username = Column(String(128), nullable=False, unique=True)
     password = Column(String(128), nullable=False)
-    db_list = Column(JSON, nullable=False)
+    db_list = Column(JSON, nullable=False, default={})
 
 class Other_users(Base):
     __tablename__ = "other_users"

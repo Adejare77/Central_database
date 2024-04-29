@@ -1,7 +1,14 @@
-{% block checkbox %}
+{% extends "base.html" %}
+
+{% block content %}
+  <form action="/user/database/tables" method="POST">
     <dl>
-      <dt> Please check one or more of the following </dt>
-      {% for  in  %}{% endfor %}
-      <dd><input type="checkbox" value=""><label>{{ data }} </dd>
+      <dt>Please check one or more of the following</dt>
+      {% for item in data %}
+      <dd><input type="checkbox" value="{{ item }}" name="selected_tb"><label>{{ item }} </label></dd>
+      {% endfor %}
     </dl>
-{% endblock checkbox %}
+    <button type="submit" name="submit_button">Submit</button>
+  </form>
+{% endblock %}
+

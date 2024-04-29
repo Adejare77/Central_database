@@ -8,11 +8,11 @@ from os import getenv
 
 
 class Database:
+    url = "mysql+mysqldb://{}:{}@localhost:3306/{}".format(
+        getenv("USER"), getenv("SECRET_KEY"), getenv("DATABASE"))
     def __init__(self, username) -> None:
         self.user = username
-        url = "mysql+mysqldb://{}:{}@localhost:3306/{}".format(
-            getenv("USER"), getenv("SECRET_KEY"), getenv("DATABASE"))
-        engine = create_engine(url, pool_pre_ping=True)
+        engine = create_engine(Database.url, pool_pre_ping=True)
         self.session = sessionmaker(bind=engine)()
         self.is_owner = self.get_user
         self.fmt_db_lists = self.get_fmt_db_list
@@ -20,7 +20,7 @@ class Database:
         engine.dispose()
 
     @property
-    def get_user(self):
+    def get_user(self) -> str:
         try:
             owner = self.session.query(Primary_owner.username).filter_by(username=self.user).one()
             return Primary_owner
@@ -34,7 +34,7 @@ class Database:
         return fmt_db_list_dict
 
     @property
-    def get_fmt_db(self):  # returns the specific fmt_db_list {'fmt': db}
+    def get_fmt_db(self) -> dict:  # returns the specific fmt_db_list {'fmt': db}
         fmt_db_lists = self.fmt_db_lists
         for fmt, db_list in fmt_db_lists.items():
             if self.db in db_list:
@@ -47,16 +47,8 @@ class Database:
         self.db = db
         return self.db
 
-    def get_permissions(self, db):
-        if self.is_owner == Primary_owner:
-            return ['ALL']
-        permissions = self.session.query(Other_users.permissions).filter_by(username=self.user).one()
-        # permissions[0] converts sqlalchemy instance to dict
-        operations = permissions[0][db]
-        return operations
-
     @property
-    def get_db_list(self):
+    def get_db_list(self) -> list:
         db_list = self.get_fmt_db_list
         db_list = [db for db in [db_list for db_list in self.get_fmt_db_list.values()]]
         db_list = [db for dbs in self.get_fmt_db_list.values() for db in dbs]
