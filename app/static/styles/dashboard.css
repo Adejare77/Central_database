@@ -1,0 +1,33 @@
+.dash{
+    border: 2px solid red;
+    display: flex;
+    padding:  5rem 5rem 5rem 7rem;
+    flex-direction: column;
+    justify-content: flex-start;
+    align-items: flex-start;
+    gap: 3rem;
+}
+
+.create{
+    width: 100%;
+    display: flex;
+    justify-content: flex-end;
+}
+.dash .btn-create{
+    background-color: rgb(33,76,65);
+    color: #f9f9f9;
+    border: 0.5px solid #f9f9f9;
+}
+
+.table-header .table-cell{
+    font-family: 'Saira Condensed', sans-serif;
+    color: #f9f9f9;
+    text-align: center;
+    font-size: 1.5rem;
+}
+
+.table-cell{
+    font-family: 'Noto Sans', sans-serif;
+    color: #f9f9f9;
+    text-align: center;
+}

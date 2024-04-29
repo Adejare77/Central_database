@@ -17,12 +17,19 @@ from app.forms import ResetPasswordRequestForm
 from app.email import send_password_reset_email
 from app.forms import ResetPasswordForm
 
+# DUMMY DATA FOR DASHBOARD
+headings = ('Database', 'Engine', 'Date Created')
+databases = (
+    ('Employees', 'MySQL', '2 years ago'),
+    ('Users', 'MySQL', '1 year ago'),
+    ('Products', 'MySQL', '10 months ago')
+)
 
 @app.route('/')
 @app.route('/index')
 @login_required
 def index():
-    return render_template('index.html', title='Home')
+    return render_template('index.html', title='Home', headings=headings, databases=databases)
 
 @app.route('/login', methods=['GET', 'POST'])
 def login():
@@ -40,7 +47,7 @@ def login():
         if not next_page or urlsplit(next_page).netloc != '':
             next_page = url_for('index')
         return redirect(next_page)
-    return render_template('login.html', title='Sign In', form=form)
+    return render_template('login.html', title='Sign In', form=form, current_template='login.html')
 
 @app.route('/logout')
 def logout():
@@ -59,7 +66,7 @@ def register():
         db.session.commit()
         flash('Congratulations, you are now a registered user!')
         return redirect(url_for('login'))
-    return render_template('register.html', title='Register', form=form)
+    return render_template('register.html', title='Register', form=form, current_template='register.html')
 
 @app.route('/user/<username>')
 @login_required
@@ -118,3 +125,7 @@ def reset_password(token):
         flash('Your password has been reset.')
         return redirect(url_for('login'))
     return render_template('reset_password.html', form=form)
+
+@app.route('/database_details/<database_name>')
+def database_details(database_name):
+    return render_template()

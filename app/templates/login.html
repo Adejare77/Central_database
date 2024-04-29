@@ -3,11 +3,11 @@
 {% block content %}
 <div class="auth-block">
 
-    <h1>Sign In</h1>
     <div class="form-wrapper">
-
+        
         <form class="form-container" action="" method="post" novalidate>
             {{ form.hidden_tag() }}
+            <h1>Sign In</h1>
             <div class="form-field">
                 {{ form.username.label(class_='field-tag') }}
                 {{ form.username(size=32) }}<br>
@@ -24,16 +24,18 @@
             </div>
             <div class="remember-me">
                 {{ form.remember_me()  }}
-                {{ form.remember_me.label(class_='field-tag') }}
+                {{ form.remember_me.label }}
             </div>
             <div>{{ form.submit() }}</div>
+            <div class="extras">
+                <div class="register">New User? <a href="{{ url_for('register') }}">Create an Account!</a></div>
+                <div class="forgot-password">
+                    
+                    <a href="{{ url_for('reset_password_request') }}">Forgot Your Password?</a>
+                </div>
+            </div>
         </form>
-        <p>New User? <a href="{{ url_for('register') }}">Click to Register!</a></p>
    
     </div>
 </div>
-    <p>
-        Forgot Your Password?
-        <a href="{{ url_for('reset_password_request') }}">Click to Reset It</a>
-    </p>
 {% endblock %}
