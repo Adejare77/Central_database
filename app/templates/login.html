@@ -27,13 +27,15 @@
                 {{ form.remember_me.label }}
             </div>
             <div>{{ form.submit() }}</div>
-            <p>New User? <a href="{{ url_for('register') }}">Create an Account!</a></p>
+            <div class="extras">
+                <div class="register">New User? <a href="{{ url_for('register') }}">Create an Account!</a></div>
+                <div class="forgot-password">
+                    
+                    <a href="{{ url_for('reset_password_request') }}">Forgot Your Password?</a>
+                </div>
+            </div>
         </form>
    
     </div>
 </div>
-    <p>
-        Forgot Your Password?
-        <a href="{{ url_for('reset_password_request') }}">Click to Reset It</a>
-    </p>
 {% endblock %}

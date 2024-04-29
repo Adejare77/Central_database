@@ -1,7 +1,6 @@
 {% extends "base.html" %}
 
 {% block content %}
-<!-- TODO: DATABASE DASHBOARD GOES HERE -->
 <nav class="sidebar">
     <div class="sidebar-container">
         <div class="home-button">
@@ -11,22 +10,56 @@
             </a>
         </div>
         <h5>Hi, {{ current_user.username }}!</h5>
-            <ul class="menu-items">
-                <li>
-                    <a href="{{ url_for('user', username=current_user.username)}}">
-                        <span class="material-symbols-outlined">account_circle</span>
-                        <span class="button-name">Account</span>
-                    </a>
-                </li>
-                <li>
-                    <a href="{{ url_for('logout')}}">
-                        <span class="material-symbols-outlined">logout</span>
-                        <span class="button-name">Logout</span>
-                    </a>
-                </li>
-            </ul>
+        <ul class="menu-items">
+            <li>
+                <a href="{{ url_for('user', username=current_user.username)}}">
+                    <span class="material-symbols-outlined">account_circle</span>
+                    <span class="button-name">Account</span>
+                </a>
+            </li>
+            <li>
+                <a href="{{ url_for('logout')}}">
+                    <span class="material-symbols-outlined">logout</span>
+                    <span class="button-name">Logout</span>
+                </a>
+            </li>
+        </ul>
+    </div>
+</nav>
+<!-- TODO: DATABASE DASHBOARD GOES HERE -->
+<section class="dash">
+    <div class="create"">
+        <div>
+            <button type="button" class="btn btn-create"> Create Database</button>
         </div>
-    </nav>
+    </div>
+    
+    <table class="table table-dark table-hover align-middle">
+        <thead class="table-header">
+            {% for header in headings %}
+            <th class="table-cell">{{ header }}</th>
+            {% endfor %}
+        </thead>
+    
+        {% for row in databases %}
+        <tr class="table-row">
+        {% for item in row %}
+            {% if item == row[0] %}
+            <td class="table-cell">
+                <a href="#"> {{ item }} </a>
+            </td>
+            
+            {% else %}
+            <td class="table-cell">{{ item }}</td>
+            {% endif %}
+        {% endfor %}
+        </tr>
+        {% endfor %}
+    
+    </table>
+</section>
+
+
 {% endblock %}
 
 <!-- sidebar div = div for each menu item  -->
