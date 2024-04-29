@@ -1,0 +1,89 @@
+.sidebar{
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 4.5rem;
+    height: 100%;
+    background-color: rgba(85, 179, 241, 0.404);
+    backdrop-filter: blur(20px);
+    box-shadow: 0px 0px 50px 3px rgba(33, 36, 35, 0.43);
+    border: 1px solid rgba(201, 201, 201, 0.466);
+    color: #04d9e0;
+    transition: width 0.1s ease-in-out;
+}
+
+.sidebar:hover{
+    width: 11.5rem;
+}
+
+.sidebar:hover h5{
+    display: block;
+    color: rgb(173,231,193);
+}
+
+.sidebar-container{
+    height: 100%;
+    padding: 1.5rem 1rem 1.5rem 1rem;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+
+.home-button .company-name{
+    display: none;
+    font-weight: 600;
+    font-size: 1.5rem;
+}
+
+.sidebar:hover .company-name{
+    display: block;
+}
+
+.home-button a{
+    display: flex;
+    flex-direction: row;
+    gap: 5px;
+}
+
+.sidebar h5{
+    display: none;
+}
+
+
+.sidebar  a{
+    color: #c9c9c9;
+    text-decoration: none;
+}
+
+
+.sidebar ul{
+    list-style: none;
+    margin: 0;
+    padding: 0;
+}
+
+.menu-items a{
+    display: flex;
+    justify-content: start;
+    align-items: center;
+    gap: 5px;
+    padding: 1rem;
+    border-radius: 0.4rem;
+    transition:0.2s;
+}
+
+.menu-items a:hover{
+    background-color: rgba(173,231,193, 0.6);
+    color: rgb(8, 55, 102);
+}
+
+.menu-items .material-symbols-outlined{
+    font-size: 30px;
+}
+.menu-items .button-name{
+    display: none;
+}
+
+.sidebar:hover .menu-items .button-name{
+    display:block;
+}
