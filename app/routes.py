@@ -17,7 +17,7 @@ from app.forms import ResetPasswordRequestForm
 from app.email import send_password_reset_email
 from app.forms import ResetPasswordForm
 
-# DUMMY DATA FOR DASHBOARD
+# NOTE: DUMMY DATA FOR DASHBOARD
 headings = ('Database', 'Engine', 'Date Created')
 databases = (
     ('Employees', 'MySQL', '2 years ago'),
@@ -126,6 +126,7 @@ def reset_password(token):
         return redirect(url_for('login'))
     return render_template('reset_password.html', form=form)
 
+# INCOMPLETE
 @app.route('/database_details/<database_name>')
 def database_details(database_name):
-    return render_template()
+    return render_template('details.html')

@@ -33,8 +33,8 @@
 
 .dashboard-body{
    min-height: 100vh;
-   background-color: rgba(0, 0, 0, 0.2);
-   background-image: url(../images/circle-signup_bg.jpg);
+   background-color: rgba(10, 10, 10, 0.25);
+   background-image: url(../images/technology_2.jpg);
    background-size: cover;
    background-position: center;
    background-attachment: fixed;
@@ -47,6 +47,3 @@
    height: 50px;
 }
 
-nav.sidebar{
-   /* background-color: rgb(89, 34, 89); */
-}

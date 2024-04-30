@@ -4,7 +4,7 @@
     left: 0;
     width: 4.5rem;
     height: 100%;
-    background-color: rgba(85, 179, 241, 0.404);
+    background-color: rgba(167,190,211, 0.14);
     backdrop-filter: blur(20px);
     box-shadow: 0px 0px 50px 3px rgba(33, 36, 35, 0.43);
     border: 1px solid rgba(201, 201, 201, 0.466);
@@ -13,12 +13,13 @@
 }
 
 .sidebar:hover{
-    width: 11.5rem;
+    width: 10rem;
 }
 
-.sidebar:hover h5{
+.sidebar:hover h6{
     display: block;
-    color: rgb(173,231,193);
+    padding: 0.1rem;
+    color: rgb(37, 31, 32);
 }
 
 .sidebar-container{
@@ -27,12 +28,13 @@
     display: flex;
     flex-direction: column;
     align-items: center;
+    gap: 0.8rem;
 }
 
 .home-button .company-name{
     display: none;
     font-weight: 600;
-    font-size: 1.5rem;
+    font-size: 1.4rem;
 }
 
 .sidebar:hover .company-name{
@@ -45,7 +47,7 @@
     gap: 5px;
 }
 
-.sidebar h5{
+.sidebar h6{
     display: none;
 }
 
@@ -70,10 +72,11 @@
     padding: 1rem;
     border-radius: 0.4rem;
     transition:0.2s;
+    color: rgb(8, 55, 102);
 }
 
 .menu-items a:hover{
-    background-color: rgba(173,231,193, 0.6);
+    background-color: rgba(167,190,211, 0.6);
     color: rgb(8, 55, 102);
 }
 

@@ -17,7 +17,6 @@
       {% endif %}
     </head>
     <body {% if current_template == 'register.html' or current_template == 'login.html' %} class="login-body" {% else %} class="dashboard-body" {% endif %}>
-        <!-- {% include 'navbar.html' %} -->
         
 	{% with messages = get_flashed_messages() %}
         {% if messages %}
