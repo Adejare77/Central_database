@@ -130,3 +130,21 @@ def reset_password(token):
 @app.route('/database_details/<database_name>')
 def database_details(database_name):
     return render_template('details.html')
+
+@app.route('/create_database', methods=['GET', 'POST'])
+@login_required
+def create_database():
+    database_engines = ['MySQL', 'PostgreSQL', 'MongoDB']
+    return render_template('database.html', title='Create Database', database_engines=database_engines)
+
+@app.route('/submit_database_form', methods=['POST'])
+@login_required
+def submit_database_form():
+    if request.method == 'POST':
+        # Retrieve form data
+        cluster_name = request.form.get('cluster_name')
+        db_engine = request.form.get('db_engine')
+        # Redirect to the dashboard page after form submission
+        return redirect(url_for('index'))
+    else:
+        return redirect(url_for('index'))

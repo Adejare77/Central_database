@@ -1,0 +1,25 @@
+{% extends "base.html" %}
+
+{% block content %}
+	<h1>Create A New Database</h1>
+    
+    <!-- Database Cluster Form -->
+    <form action="{{ url_for('submit_database_form') }}" method="post">
+        <label for="cluster_name">Name Your Database Cluster:</label>
+        <input type="text" id="cluster_name" name="cluster_name" required>
+	<br>
+        <!-- Database Engine Selection -->
+        <label for="db_engine">Choose A Database Engine:</label>
+        <select id="db_engine" name="db_engine" required>
+            {% for engine in database_engines %}
+                <option value="{{ engine }}">{{ engine }}</option>
+            {% endfor %}
+        </select>
+	<br>
+        <!-- Submit Button -->
+        <button type="submit">Create Database</button>
+    </form>
+
+    <!-- Back Button -->
+    <a href="{{ url_for('index') }}">Back</a>
+{% endblock %}
