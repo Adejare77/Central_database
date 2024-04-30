@@ -19,9 +19,15 @@ h2{
 }
 .dash .btn-create{
     background-color: rgb(167,190,211);
+   
+    border: 0.5px solid #f9f9f9d7;
+}
+
+.dash .btn-create a{
+    text-decoration: none;
     color: #292626;
     font-weight: 600;
-    border: 0.5px solid #f9f9f9d7;
+
 }
 
 .table{
@@ -50,8 +56,13 @@ h2{
     text-align: center;
 }
 
+.table-cell{
+    font-size: 1rem;
+}
+
 .table-cell a{
     text-decoration: none;
     color: rgb(8, 55, 102);
+    font-size: 1.2rem;
     font-weight: 500;
 }
