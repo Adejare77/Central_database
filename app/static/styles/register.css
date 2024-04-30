@@ -24,15 +24,14 @@ h1 {
 
 .forgot-password{
     display: block;
-    border: 1px solid rgba(241, 240, 240, 0.46);
 }
+
 .forgot-password, .forgot-password a{
     margin-top: 10px;
     font-family: 'Noto Sans', sans-serif;
     font-size: 12px;
     font-weight: 600;
     font-style: normal;
-    background-color: rgba(0, 0, 0, 0.466);
 }
 
 
