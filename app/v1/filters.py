@@ -1,14 +1,18 @@
 #!/usr/bin/python3
-from app.v1.accounts import Account
-from sqlalchemy.dialects.postgresql import JSONB
+# from app.v1.accounts import Account
+from app.v1.database import CreateClassTable
+# from sqlalchemy.dialects.postgresql import JSONB
 
 
-class Filter(Account):
-    def __init__(self, username, db, tables, columns=None) -> None:
-        super().__init__(username, db, tables, columns)
-        self.mapped_db = self.get_tbl_cls
+class Filter(CreateClassTable):
+    def __init__(self, id, db, tables) -> None:
+        super().__init__(id, db)
+        self.tables = tables
+        self.mapped_db = self.tbl_cls
+        self.columns = None
 
     def table_headers(self, columns=None) -> list:
+        self.columns = columns
         if type(self.tables) == str:
             self.tables = list([self.tables])
         all_tbl_headers = self.get_tb_columns(self.tables)
@@ -21,7 +25,6 @@ class Filter(Account):
         if not self.tables:
             print("Please Select at least a Table")
             return
-        self.columns = columns
         self.tb = [self.mapped_db[tbl_cls] for tbl_cls in self.mapped_db.keys() if tbl_cls in self.tables]
         query = self.session.query(*self.tb)  # innerjoin
 
@@ -74,12 +77,6 @@ class Filter(Account):
                     self.session.delete(row)
                     self.session.commit()
         else:
-            """The purpose of "k" is very important. Since, the arrangement
-            of "self.tb" is unordered, then the column to be delete might
-            change. e.g if I use self.tb[0] in the getattr(), this will always refer
-            to the first table column, which might be any of the table, since they don't
-            follow orders. "k" tracks the using table name and then execute based
-            on the giving column"""
             k = 0 # choose the first value in self.tb
             for i in range(1, len(self.tb)):
                 query = query.join(self.tb[i])
@@ -91,3 +88,8 @@ class Filter(Account):
                     for row in rows:
                         self.session.delete(row)
                         self.session.commit()
+
+    def update_data(self, table, column, value):
+        tbl_cls = self.tbl_cls[table]
+        query = self.session.query(table).filter_by(**{column: value})
+        # update = query.update(tbl_cls.)

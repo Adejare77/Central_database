@@ -1,11 +1,11 @@
 {% extends "base.html" %}
 
 {% block content %}
-  <form action="/user/database/tables" method="POST">
+  <form action="{{ route }}" method="POST">
     <dl>
       <dt>Please check one or more of the following</dt>
       {% for item in data %}
-      <dd><input type="checkbox" value="{{ item }}" name="selected_tb"><label>{{ item }} </label></dd>
+      <dd><input type="checkbox" value="{{ item }}" name={{ name }}><label>{{ item }} </label></dd>
       {% endfor %}
     </dl>
     <button type="submit" name="submit_button">Submit</button>
