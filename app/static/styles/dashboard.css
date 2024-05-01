@@ -17,9 +17,9 @@ h2{
     font-family: 'Saira Condensed', sans-serif;
     font-weight:700;
 }
+
 .dash .btn-create{
     background-color: rgb(167,190,211);
-   
     border: 0.5px solid #f9f9f9d7;
 }
 
@@ -31,7 +31,7 @@ h2{
 }
 
 .table{
-    background-color: rgba(250, 247, 247, 0.53);
+    background-color: rgba(250, 250, 250, 0.853);
     backdrop-filter: blur(5px);
     border-radius: .5rem;
     box-shadow: .3rem .3rem #0006;
@@ -63,6 +63,6 @@ h2{
 .table-cell a{
     text-decoration: none;
     color: rgb(8, 55, 102);
-    font-size: 1.2rem;
+    font-size:1.2rem;
     font-weight: 500;
 }
