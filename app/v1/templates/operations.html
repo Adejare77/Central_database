@@ -1,0 +1,13 @@
+{% extends "base.html" %}
+
+{% block content %}
+  <form action="/query_db" method="POST">
+    <dl>
+      <dt>Please check one or more of the following</dt>
+      {% for item in data %}
+      <dd><button type="submit" name="operations" value="{{ item }}">{{ item }}</button></dd>
+      {% endfor %}
+    </dl>
+  </form>
+{% endblock %}
+
