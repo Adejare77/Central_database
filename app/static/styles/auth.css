@@ -88,7 +88,7 @@ h1, h2 {
 } */
 
  
-.form-field input{
+.form-field input, .form-field textarea{
     width: 100%;
     border: none;
     background: rgba(255, 255, 255, 0.1);
@@ -98,7 +98,11 @@ h1, h2 {
     font-weight: 400;
 }
 
-.form-field input:focus{
+textarea{
+    max-width: 70%;
+}
+
+.form-field input:focus, .form-field textarea:focus{
     outline: solid 2px rgba(163, 194, 235, 0.466);
     
 }
@@ -125,7 +129,7 @@ h1, h2 {
     /* align-content: flex-start; */
 }
 
-.remember-me > input{
+.remember-me > input {
     width: 20px;
 }
 
@@ -156,5 +160,10 @@ h1, h2 {
 #password-request-submit{
     color: rgb(8, 55, 102);
 
+}
+
+.validation-alert{
+    font-size: x-small;
+    align-self: small;
 }
 
