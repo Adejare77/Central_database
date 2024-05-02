@@ -20,14 +20,6 @@ class Database:
         self.session.close()
         engine.dispose()
 
-    # @property
-    # def get_user(self) -> str:
-    #     try:
-    #         owner = self.session.query(Primary_owner.username).filter_by(username=self.user).one()
-    #         return Primary_owner
-    #     except NoResultFound as e:
-    #         return Other_users
-
     @property
     def get_fmt_db_list(self) -> dict: # Returns {'fmt1': [db1, db2], 'fmt2': [db3]}
         try:

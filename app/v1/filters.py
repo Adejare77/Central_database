@@ -92,4 +92,8 @@ class Filter(CreateClassTable):
     def update_data(self, table, column, value):
         tbl_cls = self.tbl_cls[table]
         query = self.session.query(table).filter_by(**{column: value})
+        print("=======================")
+        print(query)
+        print(query.all())
+        print("=======================")
         # update = query.update(tbl_cls.)
