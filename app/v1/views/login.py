@@ -1,6 +1,6 @@
 #!/usr/bin/python3
 
-from app.v1.database import Database
+from app.database import Database
 from app.v1.views import central_db
 from flask import session, redirect, request, render_template
 import json

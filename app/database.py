@@ -2,7 +2,7 @@
 from sqlalchemy import create_engine, text, MetaData
 from sqlalchemy.orm import sessionmaker
 from sqlalchemy.exc import NoResultFound, OperationalError
-from app.v1.central_db_tables import UserDatabase
+from app.central_db_tables import UserDatabase
 from sqlalchemy.ext.automap import automap_base
 from os import getenv
 

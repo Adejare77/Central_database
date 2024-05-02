@@ -1,6 +1,6 @@
 #!/usr/bin/python3
 # from app.v1.accounts import Account
-from app.v1.database import CreateClassTable
+from app.database import CreateClassTable
 # from sqlalchemy.dialects.postgresql import JSONB
 
 
