@@ -5,17 +5,29 @@ from app.forms import LoginForm
 from flask_login import current_user, login_user
 import sqlalchemy as sa
 from app import db
+""" from app.models import CentralDatabase """
 from app.forms import RegistrationForm
 from app.models import User
 from flask_login import logout_user
 from flask_login import login_required
-from flask import request
+from flask import request, jsonify
 from urllib.parse import urlsplit
 from datetime import datetime, timezone
 from app.forms import EditProfileForm
 from app.forms import ResetPasswordRequestForm
 from app.email import send_password_reset_email
 from app.forms import ResetPasswordForm
+from werkzeug.utils import secure_filename
+import os
+
+ALLOWED_EXTENSIONS = {
+    'mysql': ['.frm', '.ibd', '.myd', '.myi', '.ibdata'],
+    'postgresql': ['.pgsql', '.pgdata', '.sql', '.pg_dump'],
+    'sqlite': ['.sqlite', '.db', '.sqlite3'],
+    'mssql': ['.mdf', '.ldf', '.bak', '.ndf'],
+    'oracle': ['.log', '.dbf', '.ctl'],
+    'mariadb': ['ibd', '.frm']
+}
 
 # NOTE: DUMMY DATA FOR DASHBOARD
 headings = ('Database', 'Engine', 'Date Created')
@@ -134,7 +146,7 @@ def database_details(database_name):
 @app.route('/create_database', methods=['GET', 'POST'])
 @login_required
 def create_database():
-    database_engines = ['MySQL', 'PostgreSQL', 'MongoDB']
+    database_engines = ALLOWED_EXTENSIONS
     return render_template('database.html', title='Create Database', database_engines=database_engines)
 
 @app.route('/submit_database_form', methods=['POST'])
