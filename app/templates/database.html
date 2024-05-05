@@ -2,14 +2,14 @@
 
 {% block content %}
 	<h1>Create A New Database</h1>
-    
+
     <!-- Database Cluster Form -->
-    <form action="{{ url_for('submit_database_form') }}" method="post">
-        <label for="cluster_name">Name Your Database Cluster:</label>
-        <input type="text" id="cluster_name" name="cluster_name" required>
+    <form action="{{ url_for('submit_database_form') }}" method="post" enctype="multipart/form-data">
+        <label>Name of Database/Directory: <input type="text" name="foldername" /></label><br/><br/>
+        <label>Upload the Database/Directory: <input type="file" name="files[]" webkitdirectory mozdirectory /></label>
 	<br>
         <!-- Database Engine Selection -->
-        <label for="db_engine">Choose A Database Engine:</label>
+        <label for="db_engine">Database format:</label>
         <select id="db_engine" name="db_engine" required>
             {% for engine in database_engines %}
                 <option value="{{ engine }}">{{ engine }}</option>
@@ -17,7 +17,7 @@
         </select>
 	<br>
         <!-- Submit Button -->
-        <button type="submit">Create Database</button>
+        <button type="submit">Upload Database</button>
     </form>
 
     <!-- Back Button -->

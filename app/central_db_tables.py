@@ -10,7 +10,7 @@ Base = declarative_base()
 class UserDatabase(Base):
     __tablename__ = "user_database"
     id = Column(Integer, primary_key=True)
-    db_list = Column(JSON, nullable=True)
+    db_list = Column(JSON, nullable=True, default=None)
 
 
 if __name__ == '__main__':

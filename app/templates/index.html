@@ -28,13 +28,13 @@
 </nav>
 <!-- TODO: DATABASE DASHBOARD GOES HERE -->
 <section class="dash">
-    <div class="create"">
+    <div class="create">
         <h2>Databases</h2>
         <div>
-		<a href="{{ url_for('create_database') }}" class="btn btn-create"> Create Database </a>
+		<a href="{{ url_for('upload_database') }}" class="btn btn-create"> Upload Database </a>
         </div>
     </div>
-    
+
     <table class="table table-borderless table-hover align-middle">
         <thead class="table-header">
             <tr>
@@ -52,7 +52,7 @@
                 <td class="table-cell">
                     <a href="#"> {{ item }} </a>
                 </td>
-                
+
                 {% else %}
                 <td class="table-cell">{{ item }}</td>
                 {% endif %}
@@ -60,7 +60,7 @@
             </tr>
             {% endfor %}
         </tbody>
-    
+
     </table>
 </section>
 

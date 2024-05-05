@@ -5,6 +5,17 @@ from sqlalchemy.exc import NoResultFound, OperationalError
 from app.central_db_tables import UserDatabase
 from sqlalchemy.ext.automap import automap_base
 from os import getenv
+from datetime import date
+import json
+
+database = {
+    "mysql+mysqldb": "MySQL",
+    "postgresql": "PostgreSQL",
+    "mariadb": "MariaDB",
+    "sqlite": "SQLite",
+    "oracle": "Oracle",
+    "microsoft": "MicroSoftSQL"
+}
 
 
 class Database:
@@ -14,20 +25,51 @@ class Database:
         self.user = id
         engine = create_engine(Database.url, pool_pre_ping=True)
         self.session = sessionmaker(bind=engine)()
-        # self.is_owner = self.get_user
         self.fmt_db_list = self.get_fmt_db_list
         self.db_list = self.get_db_list
         self.session.close()
         engine.dispose()
 
     @property
-    def get_fmt_db_list(self) -> dict: # Returns {'fmt1': [db1, db2], 'fmt2': [db3]}
-        try:
-            fmt_db_list = self.session.query(UserDatabase).filter_by(id=self.user).one()
-            fmt_db_list_dict = fmt_db_list.db_list
-            return fmt_db_list_dict
-        except NoResultFound:
+    def get_fmt_db_dt(self) -> list:
+        fmt_db_dt = self.session.query(UserDatabase.db_list).filter_by(id=self.user).one()
+        # print("%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%")
+        # print(fmt_db_dt)
+        # print(type(fmt_db_dt))
+        if not fmt_db_dt[0]:
             return None
+        fmt_eng_dt = []
+        for key, val in fmt_db_dt.db_list.items():
+            # print(key, ":", val)
+            # print("--------------------------------------")
+            for items in val:
+                # print("===============", items)
+                fmt_eng_dt.append([items[0], database[key], items[1]])
+            # fmt_eng_dt.append([val[0], database[key], val[1]])
+        # print(fmt_eng_dt)
+        # print("%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%")
+        return fmt_eng_dt
+
+    @property
+    def get_fmt_db_list(self) -> dict: # Returns {'fmt1': [db1, db2], 'fmt2': [db3]}
+        # try:
+        fmt_db_list = self.session.query(UserDatabase.db_list).filter_by(id=self.user).one()
+        # fmt_db_list_items = json.loads(fmt_db_list.db_list)
+        # fmt_db_list_items = fmt_db_list.db_list
+        print(fmt_db_list)
+        print(type(fmt_db_list))
+        if not fmt_db_list[0]:
+            return None
+        fmt_db_list_dict = {}
+        for row in fmt_db_list:
+            for key,val in row.items():
+                values = []
+                for element in val:
+                    values.append(element[0])
+                fmt_db_list_dict[key] = values
+            return fmt_db_list_dict
+        # except NoResultFound:
+        #     return None
 
     @property
     def get_fmt_db(self) -> dict:  # returns the specific fmt_db_list {'fmt': db}
@@ -52,6 +94,48 @@ class Database:
             db_list = [db for dbs in self.fmt_db_list.values() for db in dbs]
             return db_list
         return None
+
+    def upload_data(self, **kwargs) -> list:
+        query = self.session.query(UserDatabase).filter_by(id=self.user)
+        # existing_dbs = json.loads(query.one().db_list)
+        existing_dbs = query.one().db_list
+        if existing_dbs:
+            # print("*******************")
+            # print("FIRST IF CALLED")
+            # print("*******************")
+            if set(kwargs.keys()).issubset(existing_dbs.keys()):
+                # print("*******************")
+                # print("SECOND IF CALLED")
+                # print("*******************")
+                for key in kwargs.keys():
+                    existing_list_of_key = existing_dbs[key]
+                existing_list_of_key.append(kwargs[key])
+                existing_dbs[key] = existing_list_of_key
+                query.update({UserDatabase.db_list: existing_dbs})
+
+            else:
+                # print("*******************")
+                # print("FIRST ELSE CALLED")
+                # print("*******************")
+                # print("ELSE")
+                for key, val in kwargs.items():
+                    existing_dbs[key] = [val]
+                # print("===================================")
+                # print(existing_dbs)
+                # print("===================================")
+                query.update({UserDatabase.db_list: existing_dbs})
+
+        else:
+            # print("*******************")
+            # print("SECOND ELSE CALLED")
+            # print("*******************")
+            for key, val in kwargs.items():
+                kwargs[key] = list([val])
+            query.update({UserDatabase.db_list: kwargs})
+
+
+        self.session.commit()
+
 
 
 class CreateClassTable(Database):
