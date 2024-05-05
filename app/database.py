@@ -24,19 +24,19 @@ class Database:
     def __init__(self, id) -> None:
         self.user = id
         engine = create_engine(Database.url, pool_pre_ping=True)
-        self.session = sessionmaker(bind=engine)()
+        self.Session = sessionmaker(bind=engine)
         self.fmt_db_list = self.get_fmt_db_list
         self.db_list = self.get_db_list
-        self.session.close()
-        engine.dispose()
 
     @property
     def get_fmt_db_dt(self) -> list:
-        fmt_db_dt = self.session.query(UserDatabase.db_list).filter_by(id=self.user).one()
+        session = self.Session()
+        fmt_db_dt = session.query(UserDatabase.db_list).filter_by(id=self.user).one()
         # print("%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%")
         # print(fmt_db_dt)
         # print(type(fmt_db_dt))
         if not fmt_db_dt[0]:
+            session.close()
             return None
         fmt_eng_dt = []
         for key, val in fmt_db_dt.db_list.items():
@@ -48,26 +48,33 @@ class Database:
             # fmt_eng_dt.append([val[0], database[key], val[1]])
         # print(fmt_eng_dt)
         # print("%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%")
+        session.close()
         return fmt_eng_dt
 
     @property
     def get_fmt_db_list(self) -> dict: # Returns {'fmt1': [db1, db2], 'fmt2': [db3]}
         # try:
-        fmt_db_list = self.session.query(UserDatabase.db_list).filter_by(id=self.user).one()
+        session = self.Session()
+        fmt_db_list = session.query(UserDatabase.db_list).filter_by(id=self.user).one()
         # fmt_db_list_items = json.loads(fmt_db_list.db_list)
         # fmt_db_list_items = fmt_db_list.db_list
-        print(fmt_db_list)
-        print(type(fmt_db_list))
+        # print(fmt_db_list)
+        # print(type(fmt_db_list))
         if not fmt_db_list[0]:
+            session.close()
             return None
         fmt_db_list_dict = {}
-        for row in fmt_db_list:
-            for key,val in row.items():
-                values = []
-                for element in val:
-                    values.append(element[0])
-                fmt_db_list_dict[key] = values
-            return fmt_db_list_dict
+        # print("=============&&&&&&&&&&&&&&&&&&&&&=================")
+        # print(fmt_db_list)
+        # print("============&&&&&&&&&&&&&&&&&&&&&&&======")
+        # for row in fmt_db_list:
+        for key,val in fmt_db_list[0].items():
+            values = []
+            for element in val:
+                values.append(element[0])
+            fmt_db_list_dict[key] = values
+        session.close()
+        return fmt_db_list_dict
         # except NoResultFound:
         #     return None
 
@@ -96,17 +103,16 @@ class Database:
         return None
 
     def upload_data(self, **kwargs) -> list:
-        query = self.session.query(UserDatabase).filter_by(id=self.user)
-        # existing_dbs = json.loads(query.one().db_list)
+        session = self.Session()
+        query = session.query(UserDatabase).filter_by(id=self.user)
         existing_dbs = query.one().db_list
-        if existing_dbs:
-            # print("*******************")
-            # print("FIRST IF CALLED")
-            # print("*******************")
+        if not existing_dbs:
+            for key, val in kwargs.items():
+                kwargs[key] = list([val])
+            query.update({UserDatabase.db_list: kwargs})
+
+        else:
             if set(kwargs.keys()).issubset(existing_dbs.keys()):
-                # print("*******************")
-                # print("SECOND IF CALLED")
-                # print("*******************")
                 for key in kwargs.keys():
                     existing_list_of_key = existing_dbs[key]
                 existing_list_of_key.append(kwargs[key])
@@ -114,27 +120,12 @@ class Database:
                 query.update({UserDatabase.db_list: existing_dbs})
 
             else:
-                # print("*******************")
-                # print("FIRST ELSE CALLED")
-                # print("*******************")
-                # print("ELSE")
                 for key, val in kwargs.items():
                     existing_dbs[key] = [val]
-                # print("===================================")
-                # print(existing_dbs)
-                # print("===================================")
                 query.update({UserDatabase.db_list: existing_dbs})
 
-        else:
-            # print("*******************")
-            # print("SECOND ELSE CALLED")
-            # print("*******************")
-            for key, val in kwargs.items():
-                kwargs[key] = list([val])
-            query.update({UserDatabase.db_list: kwargs})
-
-
-        self.session.commit()
+        session.commit()
+        session.close()
 
 
 
