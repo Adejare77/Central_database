@@ -7,10 +7,7 @@ from flask_mail import Mail
 from flask_moment import Moment
 from flask_session import Session
 
-central_db = Blueprint("central_db", __name__)
-
 app = Flask(__name__)
-app.register_blueprint(central_db)
 app.config["SESSION_PERMANENT"] = False
 app.config["SESSION_TYPE"] = "filesystem"
 app.config['SECRET_KEY'] = 'your_secret_key_here'
@@ -24,4 +21,4 @@ login.login_view = 'login'
 mail = Mail(app)
 moment = Moment(app)
 
-from app import routes, models, errors
+from app import routes, models, errors, routes_filters

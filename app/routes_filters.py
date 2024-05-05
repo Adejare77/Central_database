@@ -1,10 +1,10 @@
 #!/usr/bin/python3
 
 from app.database import Database
-from app.v1 import central_db
 from flask import redirect, request, render_template, url_for, session
 from app.database import CreateClassTable
 from app.filters import Filter
+from app import app
 
 # def get_db(username):
 #     user = Database(username)
@@ -18,7 +18,7 @@ from app.filters import Filter
 #     return render_template('radio.html', data=db_list, route="/db_selection/logic",
 #                            name="database")
 
-@central_db.route("/db_selection/logic/", methods=['POST'])
+@app.route("/db_selection/logic/", methods=['POST'])
 def query_del():
     value = request.form.get("action")
     selected_db = request.form.get("database")
@@ -36,14 +36,14 @@ def query_del():
         session.get("username").remove(selected_db)
         return redirect("/db_list/")
 
-@central_db.route("/user/db_selection", methods=['GET'])
+@app.route("/user/db_selection", methods=['GET'])
 def current_db():
     selected_db = request.form.get("database")
     table_list = CreateClassTable(*session.get("username")).get_tb_list
     return render_template('checkbox.html', data=table_list, route="/user/database/tables",
                            name="selected_tb")
 
-@central_db.route("/user/database/tables", methods=['POST'])
+@app.route("/user/database/tables", methods=['POST'])
 def tables():
     if request.method == 'POST':
         selected_table = request.form.getlist("selected_tb")
@@ -55,7 +55,7 @@ def tables():
     return render_template('checkbox.html', data=all_inst_headers, route="/user/database/tables/query",
                            name="columns")
 
-@central_db.route("/user/database/tables/query", methods=['POST'])
+@app.route("/user/database/tables/query", methods=['POST'])
 def query():
     columns = request.form.getlist("columns")
     user_info = session.get('username')
@@ -63,3 +63,7 @@ def query():
     inst.table_headers(columns)
     obj = inst.all_rows()
     return render_template('data.html', headers=columns, data=obj)
+
+# print("*********************************************")
+# print(app.url_map)
+# print("*********************************************")

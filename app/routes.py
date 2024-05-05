@@ -18,7 +18,8 @@ from app.email import send_password_reset_email
 from app.forms import ResetPasswordForm
 from app.user import MyUser
 import os
-from app.database import Database
+from app.database import Database, CreateClassTable
+from app.filters import Filter
 
 
 # NOTE: DUMMY DATA FOR DASHBOARD
@@ -174,16 +175,14 @@ def submit_database_form():
                     file_path = os.path.join(path, filename)
                     files.save(file_path)
                 new_data = {fmt: [db_name, date.today().strftime("%Y-%m-%d")]}
-                # print("--------------------------")
-                # print(new_data, current_user.id)
-                # print("--------------------------")
                 Database(current_user.id).upload_data(**new_data)
-                # print("*********************")
-                # print(current_user.id)
-                # print("*********************")
                 return True
         return False
 
     if check_folder():
         return redirect('/index')
     return redirect(url_for('index'))
+
+# print("==========================*****************====================")
+# print(app.url_map)
+# print("==========================*****************====================")
