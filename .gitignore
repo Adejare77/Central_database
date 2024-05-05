@@ -3,3 +3,4 @@ projenv/
 new-venv/
 *.pyc
 app.db
+main.py
