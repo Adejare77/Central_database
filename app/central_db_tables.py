@@ -1,8 +1,7 @@
 #!/usr/bin/python3
 
 from sqlalchemy import String, Column, Integer, DateTime, func, JSON, ForeignKey, create_engine
-from sqlalchemy.orm import declarative_base, sessionmaker
-from os import getenv
+from sqlalchemy.orm import declarative_base
 
 
 Base = declarative_base()

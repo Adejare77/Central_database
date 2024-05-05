@@ -1,7 +1,5 @@
 #!/usr/bin/python3
-# from app.v1.accounts import Account
 from app.database import CreateClassTable
-# from sqlalchemy.dialects.postgresql import JSONB
 
 
 class Filter(CreateClassTable):

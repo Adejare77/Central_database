@@ -38,17 +38,7 @@ acceptable_format = {
 @login_required
 def index():
     db_list = Database(current_user.id).get_fmt_db_dt
-    print("----------------------------")
-    print(db_list)
-    print(type(db_list))
-    print(current_user.id)
-    print("----------------------------")
     databases = db_list if db_list else [["None", "None", "None"]]
-    # print(databases)
-    # print("***********************")
-    # session["Databases"] = db_list
-    # return render_template('radio.html', data=db_list, route="/db_selection/logic",
-    #                        name="database")
     return render_template('index.html', title='Home', headings=headings, databases=databases)
 
 @app.route('/login', methods=['GET', 'POST'])
@@ -84,7 +74,7 @@ def register():
         user.set_password(form.password.data)
         db.session.add(user)
         db.session.commit()
-        MyUser().addUser(user.id)
+        MyUser(user.id).addUser()
         flash('Congratulations, you are now a registered user!')
         return redirect(url_for('login'))
     return render_template('register.html', title='Register', form=form, current_template='register.html')

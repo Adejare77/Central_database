@@ -22,32 +22,23 @@ class Database:
     url = "mysql+mysqldb://{}:{}@localhost:3306/{}".format(
         getenv("USER"), getenv("SECRET_KEY"), getenv("DATABASE"))
     def __init__(self, id) -> None:
-        self.user = id
-        engine = create_engine(Database.url, pool_pre_ping=True)
-        self.Session = sessionmaker(bind=engine)
+        self.id = id
+        self.engine = create_engine(Database.url, pool_pre_ping=True)
+        self.Session = sessionmaker(bind=self.engine)
         self.fmt_db_list = self.get_fmt_db_list
         self.db_list = self.get_db_list
 
     @property
     def get_fmt_db_dt(self) -> list:
         session = self.Session()
-        fmt_db_dt = session.query(UserDatabase.db_list).filter_by(id=self.user).one()
-        # print("%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%")
-        # print(fmt_db_dt)
-        # print(type(fmt_db_dt))
+        fmt_db_dt = session.query(UserDatabase.db_list).filter_by(id=self.id).one()
         if not fmt_db_dt[0]:
             session.close()
             return None
         fmt_eng_dt = []
         for key, val in fmt_db_dt.db_list.items():
-            # print(key, ":", val)
-            # print("--------------------------------------")
             for items in val:
-                # print("===============", items)
                 fmt_eng_dt.append([items[0], database[key], items[1]])
-            # fmt_eng_dt.append([val[0], database[key], val[1]])
-        # print(fmt_eng_dt)
-        # print("%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%")
         session.close()
         return fmt_eng_dt
 
@@ -55,20 +46,12 @@ class Database:
     def get_fmt_db_list(self) -> dict: # Returns {'fmt1': [db1, db2], 'fmt2': [db3]}
         # try:
         session = self.Session()
-        fmt_db_list = session.query(UserDatabase.db_list).filter_by(id=self.user).one()
-        # fmt_db_list_items = json.loads(fmt_db_list.db_list)
-        # fmt_db_list_items = fmt_db_list.db_list
-        # print(fmt_db_list)
-        # print(type(fmt_db_list))
-        if not fmt_db_list[0]:
+        fmt_db_list = session.query(UserDatabase).filter_by(id=self.id).one().db_list
+        if not fmt_db_list:
             session.close()
             return None
         fmt_db_list_dict = {}
-        # print("=============&&&&&&&&&&&&&&&&&&&&&=================")
-        # print(fmt_db_list)
-        # print("============&&&&&&&&&&&&&&&&&&&&&&&======")
-        # for row in fmt_db_list:
-        for key,val in fmt_db_list[0].items():
+        for key,val in fmt_db_list.items():
             values = []
             for element in val:
                 values.append(element[0])
@@ -104,29 +87,43 @@ class Database:
 
     def upload_data(self, **kwargs) -> list:
         session = self.Session()
-        query = session.query(UserDatabase).filter_by(id=self.user)
-        existing_dbs = query.one().db_list
-        if not existing_dbs:
-            for key, val in kwargs.items():
-                kwargs[key] = list([val])
-            query.update({UserDatabase.db_list: kwargs})
+        query = session.query(UserDatabase).filter_by(id=self.id).one().db_list
+        for key in kwargs.keys():
+            key
+        if not query:
+            kwargs[key] = list([kwargs[key]])
+            query = kwargs
 
         else:
-            if set(kwargs.keys()).issubset(existing_dbs.keys()):
-                for key in kwargs.keys():
-                    existing_list_of_key = existing_dbs[key]
-                existing_list_of_key.append(kwargs[key])
-                existing_dbs[key] = existing_list_of_key
-                query.update({UserDatabase.db_list: existing_dbs})
+            if set(kwargs.keys()).issubset(query.keys()):
+                query[key].append(kwargs[key])
+                session.query(UserDatabase).filter_by(id=self.id).update({UserDatabase.db_list: query})
 
             else:
-                for key, val in kwargs.items():
-                    existing_dbs[key] = [val]
-                query.update({UserDatabase.db_list: existing_dbs})
+                kwargs[key] = list([kwargs[key]])
+                query[key] = kwargs
 
+        session.query(UserDatabase).filter_by(id=self.id).update({UserDatabase.db_list: query})
         session.commit()
         session.close()
 
+    def del_central_database(self):
+        session = self.Session()
+        query = session.query(UserDatabase).filter_by(id=self.id).one().db_list
+        if not query:
+            session.close()
+            return None
+        for key in self.get_fmt_db.keys():
+            key = key
+        for items in query[key]:
+            if self.db in items:
+                query[key].remove(items)
+        session.query(UserDatabase).filter_by(id=self.id).update({UserDatabase.db_list: query})
+        session.commit()
+        session.close()
+
+    def __del__(self):
+        self.engine.dispose()
 
 
 class CreateClassTable(Database):
@@ -143,7 +140,7 @@ class CreateClassTable(Database):
         url = "{}://{}:{}@localhost:3306/{}".format(self.fmt,
             getenv("USER"), getenv("SECRET_KEY"), self.db)
         self.engine = create_engine(url, pool_pre_ping=True)
-        self.session = sessionmaker(bind=self.engine)()
+        # self.Session = sessionmaker(bind=self.engine)
         self.tbl_cls = self.get_tbl_cls
 
     @property
@@ -182,6 +179,7 @@ class CreateClassTable(Database):
         with engine.connect() as connection:
             connection.execute(text(query))
         engine.dispose()
+        self.del_central_database()
 
     def del_table(self, tables=[]):
         if not tables:
@@ -196,6 +194,5 @@ class CreateClassTable(Database):
                 tb.__table__.drop(self.engine)
 
 
-    def close_db(self):
-        self.session.close()
+    def __del__(self):
         self.engine.dispose()

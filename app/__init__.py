@@ -1,4 +1,4 @@
-from flask import Flask
+from flask import Flask, Blueprint
 from config import Config
 from flask_sqlalchemy import SQLAlchemy
 from flask_migrate import Migrate
@@ -7,11 +7,15 @@ from flask_mail import Mail
 from flask_moment import Moment
 from flask_session import Session
 
+central_db = Blueprint("central_db", __name__)
+
 app = Flask(__name__)
+app.register_blueprint(central_db)
 app.config["SESSION_PERMANENT"] = False
 app.config["SESSION_TYPE"] = "filesystem"
 app.config['SECRET_KEY'] = 'your_secret_key_here'
 Session(app)
+
 app.config.from_object(Config)
 db = SQLAlchemy(app)
 migrate = Migrate(app, db)

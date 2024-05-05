@@ -1,22 +1,22 @@
 #!/usr/bin/python3
 
-from app.v1.database import Database
-from app.v1.views import central_db
+from app.database import Database
+from app.v1 import central_db
 from flask import redirect, request, render_template, url_for, session
-from app.v1.database import CreateClassTable
-from app.v1.filters import Filter
+from app.database import CreateClassTable
+from app.filters import Filter
 
 # def get_db(username):
 #     user = Database(username)
 #     info = {username: user.get_db_list}
 #     return info
 
-@central_db.route("/db_list/")
-def database_list():
-    db_list = Database(session.get("username")).db_list
-    # session["Databases"] = db_list
-    return render_template('radio.html', data=db_list, route="/db_selection/logic",
-                           name="database")
+# @central_db.route("/db_list/")
+# def database_list():
+#     db_list = Database(session.get("username")).db_list
+#     # session["Databases"] = db_list
+#     return render_template('radio.html', data=db_list, route="/db_selection/logic",
+#                            name="database")
 
 @central_db.route("/db_selection/logic/", methods=['POST'])
 def query_del():
