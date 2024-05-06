@@ -3,39 +3,46 @@ from app.database import CreateClassTable
 
 
 class Filter(CreateClassTable):
-    def __init__(self, id, db, tables) -> None:
+    def __init__(self, id, db, tables, columns=None) -> None:
         super().__init__(id, db)
         self.tables = tables
         self.mapped_db = self.tbl_cls
-        self.columns = None
-
-    def table_headers(self, columns=None) -> list:
+        if columns and type(columns) == str:
+            columns = list([columns])
         self.columns = columns
+        self.tbl_headers = self.table_headers
+
+    @property
+    def table_headers(self) -> list:
         if type(self.tables) == str:
             self.tables = list([self.tables])
         all_tbl_headers = self.get_tb_columns(self.tables)
-        if columns:
-            selected_headers = [col for col in columns if col in all_tbl_headers]
+        if self.columns:
+            selected_headers = [col for col in self.columns if col in all_tbl_headers]
             return selected_headers
+        self.columns = all_tbl_headers
         return all_tbl_headers
 
-    def all_rows(self, columns=None):
+    def all_rows(self):
+        session = self.Session()
         if not self.tables:
             print("Please Select at least a Table")
             return
         self.tb = [self.mapped_db[tbl_cls] for tbl_cls in self.mapped_db.keys() if tbl_cls in self.tables]
-        query = self.session.query(*self.tb)  # innerjoin
+        query = session.query(*self.tb)  # innerjoin
+        return self.__get_data(query)
 
-        return self.__get_data(query, self.columns)
-
-    def __get_data(self, query, columns):
-        columns = self.table_headers(columns)
+    def __get_data(self, query):
+        # columns = self.table_headers(columns)
         data = []
         if len(self.tb) == 1:
             query = query.all()
             for row in query:
                 _data = []
-                for col in columns:
+                print("********************************")
+                print(self.columns)
+                print("********************************")
+                for col in self.columns:
                     if row.__table__.name == col.split(".")[0]:
                         column_data = getattr(row, col.split(".")[1])
                         _data.append(column_data)
@@ -48,7 +55,7 @@ class Filter(CreateClassTable):
             for row in query:
                 _data = []
                 for each_table in row:
-                    for col in columns:
+                    for col in self.columns:
                         if col.split(".")[0] == each_table.__table__.name:
                             column_data = getattr(each_table, col.split(".")[1])
                             _data.append(column_data)

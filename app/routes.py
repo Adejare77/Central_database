@@ -1,5 +1,5 @@
 """ Routing specifications for application"""
-from flask import render_template, flash, redirect, url_for, session
+from flask import render_template, flash, redirect, url_for
 from app import app
 from app.forms import LoginForm
 from flask_login import current_user, login_user
@@ -18,9 +18,7 @@ from app.email import send_password_reset_email
 from app.forms import ResetPasswordForm
 from app.user import MyUser
 import os
-from app.database import Database, CreateClassTable
-from app.filters import Filter
-
+from app.database import Database
 
 # NOTE: DUMMY DATA FOR DASHBOARD
 headings = ('Database', 'Engine', 'Date Created')

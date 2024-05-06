@@ -129,18 +129,17 @@ class Database:
 class CreateClassTable(Database):
     def __init__(self, id, db) -> None:
         super().__init__(id)
-
         self.db = db
         self.get_fmt_db = self.db  # returns a dict of {fmt: db}
         if not self.get_fmt_db:
-            print("Database you selected doesn't exist")
+            print("** DATABASE YOU SELECTED DOESN'T EXIST **")
             return
         for fmt in self.get_fmt_db.keys():
             self.fmt = fmt
         url = "{}://{}:{}@localhost:3306/{}".format(self.fmt,
             getenv("USER"), getenv("SECRET_KEY"), self.db)
         self.engine = create_engine(url, pool_pre_ping=True)
-        # self.Session = sessionmaker(bind=self.engine)
+        self.Session = sessionmaker(bind=self.engine)
         self.tbl_cls = self.get_tbl_cls
 
     @property
@@ -152,7 +151,7 @@ class CreateClassTable(Database):
             table_cls_names = dict(Base.classes.items()) # to give in dict fmt
             self.engine.dispose()
         except OperationalError:
-            print("Though DB is listed but not found")
+            print("** THOUGH DB IS LISTED, IT IS NOT FOUND **")
             return
         return table_cls_names
 
