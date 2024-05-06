@@ -8,7 +8,12 @@
       <dd><input type="checkbox" value="{{ item }}" name={{ name }}><label>{{ item }} </label></dd>
       {% endfor %}
     </dl>
+    {% if {{ name }} == "table" %}
+    <button type="submit" name="Query">Query</button>
+    <button type="submit" name="Delete">DELETE</button>
+    {% else %}
     <button type="submit" name="submit_button">Submit</button>
+    {% endif %}
   </form>
 {% endblock %}
 

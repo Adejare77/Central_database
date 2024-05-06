@@ -24,9 +24,6 @@ def table_lists(db):
 def tables():
     selected_table = request.form.getlist("table")
     session['tables'] = selected_table
-    # user_info = session.get("username")
-    # if selected_table not in user_info:
-    #     user_info.append(selected_table)
     inst = Filter(current_user.id, session.get('database'), selected_table)
     all_inst_headers = inst.table_headers
     return render_template('checkbox.html', data=all_inst_headers, route="/user/database/tables/query",
