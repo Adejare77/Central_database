@@ -1,6 +1,6 @@
-__pycache__/
 venv/
 projenv/
 new-venv/
 *.pyc
 app.db
+main.py

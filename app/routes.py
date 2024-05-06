@@ -1,5 +1,5 @@
 """ Routing specifications for application"""
-from flask import render_template, flash, redirect, url_for
+from flask import render_template, flash, redirect, url_for, session
 from app import app
 from app.forms import LoginForm
 from flask_login import current_user, login_user
@@ -11,24 +11,35 @@ from flask_login import logout_user
 from flask_login import login_required
 from flask import request
 from urllib.parse import urlsplit
-from datetime import datetime, timezone
+from datetime import datetime, timezone, date
 from app.forms import EditProfileForm
 from app.forms import ResetPasswordRequestForm
 from app.email import send_password_reset_email
 from app.forms import ResetPasswordForm
+from app.user import MyUser
+import os
+from app.database import Database, CreateClassTable
+from app.filters import Filter
+
 
 # NOTE: DUMMY DATA FOR DASHBOARD
 headings = ('Database', 'Engine', 'Date Created')
-databases = (
-    ('Employees', 'MySQL', '2 years ago'),
-    ('Users', 'MySQL', '1 year ago'),
-    ('Products', 'MySQL', '10 months ago')
-)
+
+acceptable_format = {
+    "mysql+mysqldb": ['.frm', '.ibd', '.myd', '.myi', '.ibdata'],
+    "postgresql": ['.pgsql', '.pgdata', '.sql', '.dump'],
+    "sqlite": ['.sqlite', '.db', '.sqlite3'],
+    "microsoft": ['.mdf', '.ldf', '.bak', '.ndf'],
+    "oracle": ['.log', '.dbf', '.ctl'],
+    "mariadb": ['.ibd', '.frm']
+    }
 
 @app.route('/')
 @app.route('/index')
 @login_required
 def index():
+    db_list = Database(current_user.id).get_fmt_db_dt
+    databases = db_list if db_list else [["None", "None", "None"]]
     return render_template('index.html', title='Home', headings=headings, databases=databases)
 
 @app.route('/login', methods=['GET', 'POST'])
@@ -64,6 +75,7 @@ def register():
         user.set_password(form.password.data)
         db.session.add(user)
         db.session.commit()
+        MyUser(user.id).addUser()
         flash('Congratulations, you are now a registered user!')
         return redirect(url_for('login'))
     return render_template('register.html', title='Register', form=form, current_template='register.html')
@@ -72,6 +84,7 @@ def register():
 @login_required
 def user(username):
     user = db.first_or_404(sa.select(User).where(User.username == username))
+    # session['username'] = user
     return render_template('user.html', user=user)
 
 @app.before_request
@@ -131,8 +144,45 @@ def reset_password(token):
 def database_details(database_name):
     return render_template('details.html')
 
-@app.route('/create_database', methods=['GET', 'POST'])
+@app.route('/upload_database', methods=['GET', 'POST'])
 @login_required
-def create_database():
-    database_engines = ['MySQL', 'PostgreSQL', 'MongoDB']
+def upload_database():
+    database_engines = ['None', 'MySQL', 'PostgreSQL', 'MariaDB']
     return render_template('database.html', title='Create Database', database_engines=database_engines)
+
+@app.route('/submit_database_form', methods=['POST'])
+@login_required
+def submit_database_form():
+    def check_folder():
+        home = os.path.expanduser("~/Desktop")
+        central_db_dir = os.path.join(home, "central_db")
+        os.makedirs(central_db_dir, exist_ok=True)
+        uploaded_files = request.files.getlist('files[]')
+        if not uploaded_files:
+            print("No files present in the Directory")
+            return redirect('/upload_database')  # No files uploaded
+
+        # Extract directory name and file format
+        db_name = os.path.dirname(uploaded_files[0].filename)
+        file_extension = os.path.splitext(uploaded_files[0].filename)[1]
+
+        for fmt in acceptable_format.keys():
+            if file_extension in acceptable_format[fmt]:
+                path = os.path.join(central_db_dir, db_name)
+                os.makedirs(path, exist_ok=True)
+                for files in uploaded_files:
+                    filename = files.filename.split('/')[-1]
+                    file_path = os.path.join(path, filename)
+                    files.save(file_path)
+                new_data = {fmt: [db_name, date.today().strftime("%Y-%m-%d")]}
+                Database(current_user.id).upload_data(**new_data)
+                return True
+        return False
+
+    if check_folder():
+        return redirect('/index')
+    return redirect(url_for('index'))
+
+# print("==========================*****************====================")
+# print(app.url_map)
+# print("==========================*****************====================")
