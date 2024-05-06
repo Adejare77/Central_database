@@ -139,7 +139,7 @@ def reset_password(token):
         return redirect(url_for('login'))
     return render_template('reset_password.html', form=form)
 
-# INCOMPLETE
+# NOTE: NOT IN USE
 @app.route('/database_details/<database_name>')
 def database_details(database_name):
     return render_template('details.html')

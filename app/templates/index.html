@@ -49,7 +49,7 @@
                 {% for item in row %}
                 {% if item == row[0] %}
                 <td class="table-cell">
-                    <a href="#"> {{ item }} </a>
+                    <a href="{{ url_for('query_del')}}"> {{ item }} </a>
                 </td>
 
                 {% else %}
