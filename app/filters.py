@@ -1,5 +1,6 @@
 #!/usr/bin/python3
 from app.database import CreateClassTable
+from sqlalchemy import text
 
 
 class Filter(CreateClassTable):
@@ -102,3 +103,13 @@ class Filter(CreateClassTable):
         print(query.all())
         print("=======================")
         # update = query.update(tbl_cls.)
+
+    def del_table_cols(self, columns=[]):
+        engine = self.engine
+        with engine.connect() as connection:
+            for table in self.tables:
+                for col in columns:
+                    if table == col.split(".")[0]:
+                        query = f"ALTER TABLE {table} DROP COLUMN {col.split('.')[-1]}"
+                        connection.execute(text(query))
+        engine.dispose()

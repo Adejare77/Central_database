@@ -5,12 +5,12 @@
     <dl>
       <dt>Please check one or more of the following</dt>
       {% for item in data %}
-      <dd><input type="checkbox" value="{{ item }}" name={{ name }}><label>{{ item }} </label></dd>
+      <dd><input type="checkbox" value="{{ item }}" name={{ name }}><label>{{ item }}</label></dd>
       {% endfor %}
     </dl>
-    {% if {{ name }} == "table" %}
-    <button type="submit" name="Query">Query</button>
-    <button type="submit" name="Delete">DELETE</button>
+    {% if name == "table" or name == "columns" %}
+    <button type="submit" name="action" value="Query">Query</button>
+    <button type="submit" name="action" value="Delete">DELETE</button>
     {% else %}
     <button type="submit" name="submit_button">Submit</button>
     {% endif %}
