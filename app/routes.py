@@ -155,6 +155,8 @@ def delete_dbs():
         db_list = Database(current_user.id).db_list
         if db_list:
             return render_template('database.html', title='Delete Database', databases=db_list)
+        flash("No Database Uploaded Yet")
+        return redirect(url_for('index'))
     elif request.method == 'POST':
         selected_dbs = request.form.getlist('dbs')
         Database(current_user.id).del_database(selected_dbs)
