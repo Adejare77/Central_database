@@ -18,7 +18,7 @@ from app.email import send_password_reset_email
 from app.forms import ResetPasswordForm
 from app.user import MyUser
 import os
-from app.database import Database
+from app.database import Database, CreateClassTable
 
 # NOTE: DUMMY DATA FOR DASHBOARD
 headings = ('Database', 'Engine', 'Date Created')
@@ -73,7 +73,7 @@ def register():
         user.set_password(form.password.data)
         db.session.add(user)
         db.session.commit()
-        MyUser(user.id).addUser()
+        MyUser(user.id, user.username).addUser()
         flash('Congratulations, you are now a registered user!')
         return redirect(url_for('login'))
     return render_template('register.html', title='Register', form=form, current_template='register.html')
@@ -137,10 +137,10 @@ def reset_password(token):
         return redirect(url_for('login'))
     return render_template('reset_password.html', form=form)
 
-# NOTE: NOT IN USE
-@app.route('/database_details/<database_name>')
-def database_details(database_name):
-    return render_template('details.html')
+# # NOTE: NOT IN USE
+# @app.route('/database_details/<database_name>')
+# def database_details(database_name):
+#     return render_template('details.html')
 
 @app.route('/upload_database', methods=['GET', 'POST'])
 @login_required
@@ -148,39 +148,23 @@ def upload_database():
     database_engines = ['None', 'MySQL', 'PostgreSQL', 'MariaDB']
     return render_template('database.html', title='Create Database', database_engines=database_engines)
 
+@app.route('/delete_databases', methods=['GET', 'POST'])
+@login_required
+def delete_dbs():
+    if request.method == 'GET':
+        db_list = Database(current_user.id).db_list
+        if db_list:
+            return render_template('database.html', title='Delete Database', databases=db_list)
+    elif request.method == 'POST':
+        selected_dbs = request.form.getlist('dbs')
+        Database(current_user.id).del_database(selected_dbs)
+        flash("Database(s) Successfully Deleted")
+        return redirect(url_for('index'))
+
 @app.route('/submit_database_form', methods=['POST'])
 @login_required
 def submit_database_form():
-    def check_folder():
-        home = os.path.expanduser("~/Desktop")
-        central_db_dir = os.path.join(home, "central_db")
-        os.makedirs(central_db_dir, exist_ok=True)
-        uploaded_files = request.files.getlist('files[]')
-        if not uploaded_files:
-            print("No files present in the Directory")
-            return redirect('/upload_database')  # No files uploaded
-
-        # Extract directory name and file format
-        db_name = os.path.dirname(uploaded_files[0].filename)
-        file_extension = os.path.splitext(uploaded_files[0].filename)[1]
-
-        for fmt in acceptable_format.keys():
-            if file_extension in acceptable_format[fmt]:
-                path = os.path.join(central_db_dir, db_name)
-                os.makedirs(path, exist_ok=True)
-                for files in uploaded_files:
-                    filename = files.filename.split('/')[-1]
-                    file_path = os.path.join(path, filename)
-                    files.save(file_path)
-                new_data = {fmt: [db_name, date.today().strftime("%Y-%m-%d")]}
-                Database(current_user.id).upload_data(**new_data)
-                return True
-        return False
-
-    if check_folder():
-        return redirect('/index')
+    uploaded_files = request.files.getlist('files[]')
+    check = MyUser(current_user.id, current_user.username).check_folder(uploaded_files)
+    flash("File Successfully Uploaded") if check else flash("Failed to Upload file; Upload file with right RDB format")
     return redirect(url_for('index'))
-
-# print("==========================*****************====================")
-# print(app.url_map)
-# print("==========================*****************====================")

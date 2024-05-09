@@ -1,6 +1,6 @@
 #!/usr/bin/python3
 
-from sqlalchemy import String, Column, Integer, DateTime, func, JSON, ForeignKey, create_engine
+from sqlalchemy import String, Column, Integer, JSON, create_engine
 from sqlalchemy.orm import declarative_base
 
 

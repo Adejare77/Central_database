@@ -1,12 +1,10 @@
 #!/usr/bin/python3
-from sqlalchemy import create_engine, text, MetaData
+from sqlalchemy import create_engine, text
 from sqlalchemy.orm import sessionmaker
-from sqlalchemy.exc import NoResultFound, OperationalError
+from sqlalchemy.exc import OperationalError
 from app.central_db_tables import UserDatabase
 from sqlalchemy.ext.automap import automap_base
 from os import getenv
-from datetime import date
-import json
 
 database = {
     "mysql+mysqldb": "MySQL",
@@ -44,7 +42,6 @@ class Database:
 
     @property
     def get_fmt_db_list(self) -> dict: # Returns {'fmt1': [db1, db2], 'fmt2': [db3]}
-        # try:
         session = self.Session()
         fmt_db_list = session.query(UserDatabase).filter_by(id=self.id).one().db_list
         if not fmt_db_list:
@@ -58,23 +55,6 @@ class Database:
             fmt_db_list_dict[key] = values
         session.close()
         return fmt_db_list_dict
-        # except NoResultFound:
-        #     return None
-
-    @property
-    def get_fmt_db(self) -> dict:  # returns the specific fmt_db_list {'fmt': db}
-        fmt_db_list = self.fmt_db_list
-        for fmt, db_list in fmt_db_list.items():
-            if self.db in db_list:
-                self.db = self.db
-                self.fmt = fmt
-                return dict([(self.fmt, self.db)])
-        return None
-
-    @get_fmt_db.setter
-    def get_fmt_db(self, db):
-        self.db = db
-        return self.db
 
     @property
     def get_db_list(self) -> list:
@@ -100,23 +80,36 @@ class Database:
                 session.query(UserDatabase).filter_by(id=self.id).update({UserDatabase.db_list: query})
 
             else:
-                kwargs[key] = list([kwargs[key]])
-                query[key] = kwargs
+                query[key] = list([kwargs[key]])
 
         session.query(UserDatabase).filter_by(id=self.id).update({UserDatabase.db_list: query})
         session.commit()
         session.close()
 
-    def del_central_database(self):
+    def del_database(self, dbs):
+        if type(dbs) == str:
+            dbs = list([dbs])
+        url = Database.url
+        engine = create_engine(url, pool_pre_ping=True)
+        with engine.connect() as connection:
+            for db in dbs:
+                query = f'DROP DATABASE IF EXISTS {db}'
+                connection.execute(text(query))
+                self.__del_central_database(db)
+        engine.dispose()
+
+    def __del_central_database(self, db):
         session = self.Session()
         query = session.query(UserDatabase).filter_by(id=self.id).one().db_list
         if not query:
             session.close()
             return None
-        for key in self.get_fmt_db.keys():
-            key = key
+
+        fmt_value = CreateClassTable(self.id, db).get_fmt_db
+        for fmt in fmt_value.keys():
+            key = fmt
         for items in query[key]:
-            if self.db in items:
+            if db in items:
                 query[key].remove(items)
         session.query(UserDatabase).filter_by(id=self.id).update({UserDatabase.db_list: query})
         session.commit()
@@ -130,29 +123,36 @@ class CreateClassTable(Database):
     def __init__(self, id, db) -> None:
         super().__init__(id)
         self.db = db
-        self.get_fmt_db = self.db  # returns a dict of {fmt: db}
-        if not self.get_fmt_db:
-            print("** DATABASE YOU SELECTED DOESN'T EXIST **")
-            return
         for fmt in self.get_fmt_db.keys():
             self.fmt = fmt
-        url = "{}://{}:{}@localhost:3306/{}".format(self.fmt,
+        url = "{}://{}:{}@localhost/{}".format(self.fmt,
             getenv("USER"), getenv("SECRET_KEY"), self.db)
-        self.engine = create_engine(url, pool_pre_ping=True)
+        try:
+            self.engine = create_engine(url, pool_pre_ping=True)
+            self.engine.connect()
+        except OperationalError:
+            print("** COULD NOT CONNECT TO THE SELECTED DATABASE **")
+            return
         self.Session = sessionmaker(bind=self.engine)
         self.tbl_cls = self.get_tbl_cls
 
     @property
+    def get_fmt_db(self) -> dict:  # returns the specific fmt_db_list {'fmt': db}
+        fmt_db_list = self.fmt_db_list
+        for fmt, db_list in fmt_db_list.items():
+            if self.db in db_list:
+                self.db = self.db
+                self.fmt = fmt
+                return dict([(self.fmt, self.db)])
+        return None
+
+    @property
     def get_tbl_cls(self) -> dict:
-        try:
-            Base = automap_base()
-            Base.prepare(self.engine, reflect=True)
-            # Above provides a list of tuples [(table_name, class)]
-            table_cls_names = dict(Base.classes.items()) # to give in dict fmt
-            self.engine.dispose()
-        except OperationalError:
-            print("** THOUGH DB IS LISTED, IT IS NOT FOUND **")
-            return
+        Base = automap_base()
+        Base.prepare(self.engine, reflect=True)
+        # Above provides a list of tuples [(table_name, class)]
+        table_cls_names = dict(Base.classes.items()) # to give in dict fmt
+        self.engine.dispose()
         return table_cls_names
 
     @property
@@ -169,16 +169,6 @@ class CreateClassTable(Database):
             tb_cols = _cls.__table__.columns.keys()
             columns.extend(f"{tb_name}.{tb_col}" for tb_col in tb_cols)
         return columns
-
-    @property
-    def del_database(self):
-        query = f'DROP DATABASE IF EXISTS {self.db}'
-        url = Database.url
-        engine = create_engine(url, pool_pre_ping=True)
-        with engine.connect() as connection:
-            connection.execute(text(query))
-        engine.dispose()
-        self.del_central_database()
 
     def del_table(self, tables=[]):
         if not tables:
