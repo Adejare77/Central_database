@@ -5,11 +5,12 @@ from app.forms import LoginForm
 from flask_login import current_user, login_user
 import sqlalchemy as sa
 from app import db
+""" from app.models import CentralDatabase """
 from app.forms import RegistrationForm
 from app.models import User
 from flask_login import logout_user
 from flask_login import login_required
-from flask import request
+from flask import request, jsonify
 from urllib.parse import urlsplit
 from datetime import datetime, timezone, date
 from app.forms import EditProfileForm
@@ -19,6 +20,9 @@ from app.forms import ResetPasswordForm
 from app.user import MyUser
 import os
 from app.database import Database, CreateClassTable
+
+
+
 
 # NOTE: DUMMY DATA FOR DASHBOARD
 headings = ('Database', 'Engine', 'Date Created')
