@@ -1,19 +1,27 @@
-{% extends "mybase.html" %}
+{% extends "base.html" %}
 
 {% block content %}
-  <form action="{{ route }}" method="POST">
-    <dl>
-      <dt>Please check one or more of the following</dt>
-      {% for item in data %}
-      <dd><input type="checkbox" value="{{ item }}" name={{ name }}><label>{{ item }}</label></dd>
-      {% endfor %}
-    </dl>
-    {% if name == "table" or name == "columns" %}
-    <button type="submit" name="action" value="Query">Query</button>
-    <button type="submit" name="action" value="Delete">DELETE</button>
-    {% else %}
-    <button type="submit" name="submit_button">Submit</button>
-    {% endif %}
-  </form>
+<div class="query-block">
+  <div class="query-container-1">
+    <form action="{{ route }}" method="POST">
+      <dl>
+        <dt>Please check one or more of the following</dt>
+        {% for item in data %}
+        <dd><input class="checkboxes" type="checkbox" value="{{ item }}" name="{{ name }}">
+            <label>{{ item }}</label>
+        </dd>
+        {% endfor %}
+      </dl>
+      {% if name == "table" or name == "columns" %}
+      <button class="query-btn" type="submit" name="action" value="Query">Query</button>
+      <button class="delete-btn" type="submit" name="action" value="Delete">DELETE</button>
+      {% else %}
+      <button  type="submit" name="submit_button">Submit</button>
+      {% endif %}
+    </form>
+  </div class="query-container-2">
+  <!-- NOTE: DIV FOR DYNAMIC DATA GOES HERE  -->
+  </div>
+</div>
 {% endblock %}
 
