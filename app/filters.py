@@ -40,9 +40,6 @@ class Filter(CreateClassTable):
             query = query.all()
             for row in query:
                 _data = []
-                print("********************************")
-                print(self.columns)
-                print("********************************")
                 for col in self.columns:
                     if row.__table__.name == col.split(".")[0]:
                         column_data = getattr(row, col.split(".")[1])
@@ -105,11 +102,11 @@ class Filter(CreateClassTable):
         # update = query.update(tbl_cls.)
 
     def del_table_cols(self, columns=[]):
-        engine = self.engine
-        with engine.connect() as connection:
+        with self.engine.connect() as connection:
             for table in self.tables:
                 for col in columns:
                     if table == col.split(".")[0]:
                         query = f"ALTER TABLE {table} DROP COLUMN {col.split('.')[-1]}"
                         connection.execute(text(query))
-        engine.dispose()
+                        connection.commit()
+        self.engine.dispose()

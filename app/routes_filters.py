@@ -55,15 +55,3 @@ def table_query(columns):
     inst = Filter(current_user.id, session.get('database'),
                   session['tables'], columns)
     return render_template('data.html', headers=inst.table_headers, data=inst.all_rows())
-
-
-
-
-# @app.route("/user/database/<del_tables>", methods=['GET'])
-# @login_required
-# def del_table(tables):
-#     inst = CreateClassTable(current_user.id, session.get('database')).del_table(tables)
-#     # return render_template('checkbox.html', data=all_inst_headers, route="/user/database/option",
-#     #                        name="columns")
-#     return redirect('/user/database/db')
-
