@@ -12,35 +12,36 @@ from flask_login import logout_user
 from flask_login import login_required
 from flask import request, jsonify
 from urllib.parse import urlsplit
-from datetime import datetime, timezone
+from datetime import datetime, timezone, date
 from app.forms import EditProfileForm
 from app.forms import ResetPasswordRequestForm
 from app.email import send_password_reset_email
 from app.forms import ResetPasswordForm
-from werkzeug.utils import secure_filename
+from app.user import MyUser
 import os
+from app.database import Database, CreateClassTable
 
-ALLOWED_EXTENSIONS = {
-    'mysql': ['.frm', '.ibd', '.myd', '.myi', '.ibdata'],
-    'postgresql': ['.pgsql', '.pgdata', '.sql', '.pg_dump'],
-    'sqlite': ['.sqlite', '.db', '.sqlite3'],
-    'mssql': ['.mdf', '.ldf', '.bak', '.ndf'],
-    'oracle': ['.log', '.dbf', '.ctl'],
-    'mariadb': ['ibd', '.frm']
-}
+
+
 
 # NOTE: DUMMY DATA FOR DASHBOARD
 headings = ('Database', 'Engine', 'Date Created')
-databases = (
-    ('Employees', 'MySQL', '2 years ago'),
-    ('Users', 'MySQL', '1 year ago'),
-    ('Products', 'MySQL', '10 months ago')
-)
+
+acceptable_format = {
+    "mysql+mysqldb": ['.frm', '.ibd', '.myd', '.myi', '.ibdata'],
+    "postgresql": ['.pgsql', '.pgdata', '.sql', '.dump'],
+    "sqlite": ['.sqlite', '.db', '.sqlite3'],
+    "microsoft": ['.mdf', '.ldf', '.bak', '.ndf'],
+    "oracle": ['.log', '.dbf', '.ctl'],
+    "mariadb": ['.ibd', '.frm']
+    }
 
 @app.route('/')
 @app.route('/index')
 @login_required
 def index():
+    db_list = Database(current_user.id).get_fmt_db_dt
+    databases = db_list if db_list else [["None", "None", "None"]]
     return render_template('index.html', title='Home', headings=headings, databases=databases)
 
 @app.route('/login', methods=['GET', 'POST'])
@@ -76,6 +77,7 @@ def register():
         user.set_password(form.password.data)
         db.session.add(user)
         db.session.commit()
+        MyUser(user.id, user.username).addUser()
         flash('Congratulations, you are now a registered user!')
         return redirect(url_for('login'))
     return render_template('register.html', title='Register', form=form, current_template='register.html')
@@ -84,6 +86,7 @@ def register():
 @login_required
 def user(username):
     user = db.first_or_404(sa.select(User).where(User.username == username))
+    # session['username'] = user
     return render_template('user.html', user=user)
 
 @app.before_request
@@ -138,25 +141,34 @@ def reset_password(token):
         return redirect(url_for('login'))
     return render_template('reset_password.html', form=form)
 
-# INCOMPLETE
-@app.route('/database_details/<database_name>')
-def database_details(database_name):
-    return render_template('details.html')
+# # NOTE: NOT IN USE
+# @app.route('/database_details/<database_name>')
+# def database_details(database_name):
+#     return render_template('details.html')
 
-@app.route('/create_database', methods=['GET', 'POST'])
+@app.route('/upload_database', methods=['GET', 'POST'])
 @login_required
-def create_database():
-    database_engines = ALLOWED_EXTENSIONS
+def upload_database():
+    database_engines = ['None', 'MySQL', 'PostgreSQL', 'MariaDB']
     return render_template('database.html', title='Create Database', database_engines=database_engines)
+
+@app.route('/delete_databases', methods=['GET', 'POST'])
+@login_required
+def delete_dbs():
+    if request.method == 'GET':
+        db_list = Database(current_user.id).db_list
+        if db_list:
+            return render_template('database.html', title='Delete Database', databases=db_list)
+    elif request.method == 'POST':
+        selected_dbs = request.form.getlist('dbs')
+        Database(current_user.id).del_database(selected_dbs)
+        flash("Database(s) Successfully Deleted")
+        return redirect(url_for('index'))
 
 @app.route('/submit_database_form', methods=['POST'])
 @login_required
 def submit_database_form():
-    if request.method == 'POST':
-        # Retrieve form data
-        cluster_name = request.form.get('cluster_name')
-        db_engine = request.form.get('db_engine')
-        # Redirect to the dashboard page after form submission
-        return redirect(url_for('index'))
-    else:
-        return redirect(url_for('index'))
+    uploaded_files = request.files.getlist('files[]')
+    check = MyUser(current_user.id, current_user.username).check_folder(uploaded_files)
+    flash("File Successfully Uploaded") if check else flash("Failed to Upload file; Upload file with right RDB format")
+    return redirect(url_for('index'))

@@ -26,19 +26,21 @@
         </ul>
     </div>
 </nav>
-<!-- TODO: DATABASE DASHBOARD GOES HERE -->
+<!-- NOTE: DATABASE DASHBOARD GOES HERE -->
 <section class="dash">
-    <div class="create"">
+    <div class="create">
         <h2>Databases</h2>
         <div>
-		<a href="{{ url_for('create_database') }}" class="btn btn-create"> Create Database </a>
+            <button type="button" class="btn btn-create"> <a href="{{ url_for('upload_database') }}"> Upload Database</a></button>
+        </div>
+        <div>
+            <button type="button" class="btn btn-create"> <a href="{{ url_for('delete_dbs') }}"> Delete Database</a></button>
         </div>
     </div>
-    
+
     <table class="table table-borderless table-hover align-middle">
         <thead class="table-header">
             <tr>
-
                 {% for header in headings %}
                 <th class="table-cell">{{ header }}</th>
                 {% endfor %}
@@ -50,9 +52,9 @@
                 {% for item in row %}
                 {% if item == row[0] %}
                 <td class="table-cell">
-                    <a href="#"> {{ item }} </a>
+                    <a href="{{ url_for('table_lists', db=item ) }}"> {{ item }} </a>
                 </td>
-                
+
                 {% else %}
                 <td class="table-cell">{{ item }}</td>
                 {% endif %}
@@ -60,7 +62,7 @@
             </tr>
             {% endfor %}
         </tbody>
-    
+
     </table>
 </section>
 
