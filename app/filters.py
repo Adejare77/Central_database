@@ -6,20 +6,25 @@ from sqlalchemy import text
 class Filter(CreateClassTable):
     def __init__(self, id, db, tables, columns=None) -> None:
         super().__init__(id, db)
+        if type(tables) == str:
+            tables = list([tables])
         self.tables = tables
-        self.mapped_db = self.tbl_cls
+        try:
+            self.mapped_db = self.tbl_cls
+        except AttributeError:
+            print("** DATABASE DOES NOT EITHER EXISTS OR COULDN'T CONNNECT **")
+            return
         if columns and type(columns) == str:
             columns = list([columns])
         self.columns = columns
-        self.tbl_headers = self.table_headers
+        self.tbl_headers = self.table_headers(self.tables, self.columns)
 
-    @property
-    def table_headers(self) -> list:
-        if type(self.tables) == str:
-            self.tables = list([self.tables])
-        all_tbl_headers = self.get_tb_columns(self.tables)
-        if self.columns:
-            selected_headers = [col for col in self.columns if col in all_tbl_headers]
+    def table_headers(self, tables, columns) -> list:
+        if type(tables) == str:
+            tables = list([tables])
+        all_tbl_headers = self.get_tb_columns(tables)
+        if columns:
+            selected_headers = [col for col in columns if col in all_tbl_headers]
             return selected_headers
         self.columns = all_tbl_headers
         return all_tbl_headers
@@ -110,3 +115,20 @@ class Filter(CreateClassTable):
                         connection.execute(text(query))
                         connection.commit()
         self.engine.dispose()
+
+
+    def join_groups(self):
+        join_type = ["join", "outerjoin", "leftjoin", "rightjoin"]
+        session = self.Session()
+        # query = session.query(*tb)  # innerjoin
+        amount_of_join = len(self.tables) * 2 - 2
+        if amount_of_join == 1:
+            # query.all()
+            print("The len of tb is: ", len(self.tables))
+            return None
+        join_available = []
+        for i in range(1, len(self.tables)):
+            col1 = self.table_headers(self.tables[i-1], None)
+            col2 = self.table_headers(self.tables[i], None)
+            join_available.append([col1, col2])
+        return join_available

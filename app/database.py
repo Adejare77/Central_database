@@ -123,6 +123,9 @@ class CreateClassTable(Database):
     def __init__(self, id, db) -> None:
         super().__init__(id)
         self.db = db
+        if not self.get_fmt_db:
+            print("** COULDN'T FIND OR CONNECT TO DATABASE **")
+            return None
         for fmt in self.get_fmt_db.keys():
             self.fmt = fmt
         url = "{}://{}:{}@localhost/{}".format(self.fmt,
