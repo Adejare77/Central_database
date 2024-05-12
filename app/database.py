@@ -165,7 +165,8 @@ class CreateClassTable(Database):
 
     def get_tb_columns(self, tables=[]) -> list:
         tb_cls = self.tbl_cls
-        tb = [tb_cls[tbs] for tbs in tb_cls.keys() if tbs in tables]
+        # tb = [tb_cls[tbs] for tbs in tb_cls.keys() if tbs in tables]
+        tb = [tb_cls[tbs] for tbs in tables]
         columns = []
         for _cls in tb:
             tb_name = _cls.__table__
@@ -184,7 +185,6 @@ class CreateClassTable(Database):
             else:
                 tb = self.tbl_cls[table]
                 tb.__table__.drop(self.engine)
-
 
     def __del__(self):
         self.engine.dispose()

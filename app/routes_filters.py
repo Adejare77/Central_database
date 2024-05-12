@@ -1,6 +1,5 @@
 #!/usr/bin/python3
 
-from app.database import Database
 from flask import redirect, request, render_template, url_for, session
 from app.database import CreateClassTable
 from app.filters import Filter
@@ -8,7 +7,6 @@ from app import app
 from flask_login import current_user
 from flask_login import login_required
 from flask import request
-import json
 
 
 @app.route("/user/database/<string:db>/", methods=['GET'])
@@ -16,10 +14,10 @@ import json
 def table_lists(db):
     session['database'] = db
     table_list = CreateClassTable(current_user.id, db).get_tb_list
-    return render_template('checkbox.html', data=table_list, route="/user/database/tbls_options",
+    return render_template('checkbox.html', data=table_list, route="/user/database/table/tbls_options",
                         name="table")
 
-@app.route('/user/database/tbls_options', methods=['POST'])
+@app.route('/user/database/table/tbls_options', methods=['POST'])
 @login_required
 def table_options():
     option = request.form.get("action")
@@ -29,18 +27,23 @@ def table_options():
     CreateClassTable(current_user.id, session.get('database')).del_table(selected_tables)
     return redirect(url_for('table_lists', db=session.get('database')))
 
-@app.route('/user/database/<tables>', methods=['GET'])
+@app.route('/user/database/table_cols/<tables>', methods=['GET'])
 @login_required
 def table_columns(tables):
+    if not session.get('database'):
+        return redirect(url_for('index'))
     tables = eval(tables)  # if received from url_for, always use eval
     session['tables'] = tables
     inst = Filter(current_user.id, session.get('database'), tables)
-    return render_template('checkbox.html', data=inst.table_headers, route="/user/database/cols_options",
+    headers = inst.table_headers(tables, None)
+    return render_template('checkbox.html', data=headers, route="/user/database/table_cols/cols_options",
                            name="columns")
 
-@app.route('/user/database/cols_options', methods=['POST'])
+@app.route('/user/database/table_cols/cols_options', methods=['POST'])
 @login_required
 def columns_options():
+    if not session.get('tables'):
+        return redirect(url_for('index'))
     option = request.form.get("action")
     columns = request.form.getlist('columns')
     if option == "Query":
@@ -48,10 +51,36 @@ def columns_options():
     Filter(current_user.id, session.get('database'), session.get('tables')).del_table_cols(columns)
     return redirect(url_for('table_columns', tables=session.get('tables')))
 
-@app.route("/user/database/query/<columns>", methods=['GET'])
+@app.route("/user/database/query/<columns>", methods=['GET', 'POST'])
 @login_required
 def table_query(columns):
-    columns = eval(columns)
+    if not session.get('tables'):
+        return redirect(url_for('index'))
+    if len(session['tables']) == 1:
+        inst = Filter(current_user.id, session.get('database'),
+                    session['tables'], eval(columns))
+        headers = inst.table_headers(session['tables'],
+                                     eval(session.get('columns')))
+        return render_template('data.html', headers=headers,
+                               data=inst.all_rows(),
+                               back=session.get('database'))
+    if request.method == 'GET':
+        join_types = ["join"]
+        session['columns'] = str(columns)
+        inst = Filter(current_user.id, session.get('database'),
+                    session['tables'], eval(columns))
+        return render_template('radio.html', join_types=join_types, data=inst.join_conditions, route="/user/database/query/" + columns)
+
+    join_type = request.form.get('join')
     inst = Filter(current_user.id, session.get('database'),
-                  session['tables'], columns)
-    return render_template('data.html', headers=inst.table_headers, data=inst.all_rows())
+                    session['tables'], (eval(session.get('columns'))))
+    headers = inst.table_headers(session['tables'], eval(session.get('columns')))
+    condition_keys = eval(request.form.get('action'))  # eval converts to list
+    conditions = []
+    for items in condition_keys:
+        group_conditions = []
+        for element in items:
+            group_conditions.append(request.form.get(element))
+        conditions.append(group_conditions)
+
+    return render_template('data.html', headers=headers, data=inst.all_rows(join_type, conditions), back=session.get('database'))
