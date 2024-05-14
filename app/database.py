@@ -15,7 +15,6 @@ database = {
     "microsoft": "MicroSoftSQL"
 }
 
-
 class Database:
     url = "mysql+mysqldb://{}:{}@localhost:3306/{}".format(
         getenv("USER"), getenv("SECRET_KEY"), getenv("DATABASE"))
@@ -90,12 +89,16 @@ class Database:
         if type(dbs) == str:
             dbs = list([dbs])
         url = Database.url
+        session = self.Session()
+        user = session.query(UserDatabase).filter_by(id=self.id).one().username
         engine = create_engine(url, pool_pre_ping=True)
         with engine.connect() as connection:
             for db in dbs:
-                query = f'DROP DATABASE IF EXISTS {db}'
+                dbase = user + "_" + db
+                query = f'DROP DATABASE IF EXISTS {dbase}'
                 connection.execute(text(query))
                 self.__del_central_database(db)
+        session.close()
         engine.dispose()
 
     def __del_central_database(self, db):
@@ -115,6 +118,11 @@ class Database:
         session.commit()
         session.close()
 
+    def user(self) -> str:
+        session = self.Session()
+        user = session.query(UserDatabase).filter_by(id = self.id).one().username
+        return user
+
     def __del__(self):
         self.engine.dispose()
 
@@ -128,8 +136,10 @@ class CreateClassTable(Database):
             return None
         for fmt in self.get_fmt_db.keys():
             self.fmt = fmt
+        username = self.user()
+        db = username + "_" + self.db
         url = "{}://{}:{}@localhost/{}".format(self.fmt,
-            getenv("USER"), getenv("SECRET_KEY"), self.db)
+            getenv("USER"), getenv("SECRET_KEY"), db)
         try:
             self.engine = create_engine(url, pool_pre_ping=True)
             self.engine.connect()

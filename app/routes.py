@@ -170,7 +170,8 @@ def delete_dbs():
 @app.route('/submit_database_form', methods=['POST'])
 @login_required
 def submit_database_form():
-    uploaded_files = request.files.getlist('files[]')
-    check = MyUser(current_user.id, current_user.username).check_folder(uploaded_files)
+    uploaded_files = request.files.get('uploaded_file')
+    filename = request.form.get("filename")
+    check = MyUser(current_user.id, current_user.username).check_folder(uploaded_files, filename)
     flash("File Successfully Uploaded") if check else flash("Failed to Upload file; Upload file with right RDB format")
     return redirect(url_for('index'))
