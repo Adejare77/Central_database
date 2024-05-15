@@ -1,4 +1,8 @@
 #!/usr/bin/env python3
+"""This module provides a class MyUser for managing users and
+their associated data in the central_db database. It also includes
+utility functions for interacting with the database and file system.
+"""
 from central_db_tables import UserDatabase
 from app.database import Database
 from sqlalchemy.orm import sessionmaker
@@ -10,6 +14,9 @@ from os import getenv
 from datetime import date
 
 class MyUser():
+    """Represents a user and provides methods for adding and
+    deleting users, checking folders, and managing database connections.
+    """
     acceptable_format = {
         "mysql+mysqldb": ['.frm', '.ibd', '.myd', '.myi', '.ibdata'],
         "postgresql": ['.pgsql', '.pgdata', '.sql', '.dump'],

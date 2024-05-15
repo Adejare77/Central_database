@@ -100,3 +100,5 @@ def table_query(columns):
 #     selected_tables = (request.json)['selected_tables'] # recieves the list of selected tables sent from AJAX
 #     inst = Filter(current_user.id, session.get('database'), selected_tables)
 #     return jsonify({"headers":inst.table_headers, "route":"/user/database/cols_options"})
+
+

@@ -55,6 +55,7 @@ class Database:
 
 
 class CreateClassTable(Database):
+    """module to create table"""
     def __init__(self, id, db) -> None:
         super().__init__(id)
 
@@ -101,6 +102,7 @@ class CreateClassTable(Database):
 
     @property
     def del_database(self):
+        """moodule to delete database"""
         query = f'DROP DATABASE IF EXISTS {self.db}'
         url = Database.url
         engine = create_engine(url, pool_pre_ping=True)

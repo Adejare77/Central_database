@@ -15,6 +15,9 @@ database = {
 }
 
 class Database:
+    """Initializes a database object with an ID and
+    establishes a connection to the database using SQLAlchemy
+    """
     url = "mysql+mysqldb://{}:{}@localhost:3306/{}".format(
         getenv("USER"), getenv("SECRET_KEY"), getenv("DATABASE"))
     def __init__(self, id) -> None:
@@ -26,6 +29,7 @@ class Database:
 
     @property
     def get_fmt_db_dt(self) -> list:
+        """Retrieves formatted database details based on user ID"""
         session = self.Session()
         fmt_db_dt = session.query(UserDatabase.db_list).filter_by(id=self.id).one()
         if not fmt_db_dt[0]:
@@ -40,6 +44,7 @@ class Database:
 
     @property
     def get_fmt_db_list(self) -> dict: # Returns {'fmt1': [db1, db2], 'fmt2': [db3]}
+        """Retrieves formatted database lists based on user ID."""
         session = self.Session()
         fmt_db_list = session.query(UserDatabase).filter_by(id=self.id).one().db_list
         if not fmt_db_list:
@@ -56,6 +61,7 @@ class Database:
 
     @property
     def get_db_list(self) -> list:
+        """Retrieves a list of databases accessible to the user."""
         db_list = self.fmt_db_list
         if db_list:
             db_list = [db for db in [db_list for db_list in self.fmt_db_list.values()]]
@@ -64,6 +70,7 @@ class Database:
         return None
 
     def upload_data(self, **kwargs) -> list:
+        """Uploads data to the specified database"""
         session = self.Session()
         query = session.query(UserDatabase).filter_by(id=self.id).one().db_list
         for key in kwargs.keys():
@@ -85,6 +92,7 @@ class Database:
         session.close()
 
     def del_database(self, dbs):
+        """Deletes specified databases."""
         if type(dbs) == str:
             dbs = list([dbs])
         url = Database.url
@@ -101,6 +109,7 @@ class Database:
         engine.dispose()
 
     def __del_central_database(self, db):
+        """Deletes databases associated with a user."""
         session = self.Session()
         query = session.query(UserDatabase).filter_by(id=self.id).one().db_list
         if not query:
@@ -123,10 +132,14 @@ class Database:
         return user
 
     def __del__(self):
+        """Cleans up resources when the object is deleted."""
         self.engine.dispose()
 
 
 class CreateClassTable(Database):
+    """Inherits from Database and initializes a table
+    creation object based on the specified database.
+    """
     def __init__(self, id, db) -> None:
         super().__init__(id)
         self.db = db

@@ -1,0 +1,13 @@
+{% extends "base.html" %}
+
+{% block content %}
+  <h1>Upload Database</h1>
+  <form action="{{ url_for('upload_database') }}" method="post" enctype="multipart/form-data">
+    <div class="mb-3">
+      <label for="databaseFile" class="form-label">Select Database File</label>
+      <input type="file" class="form-control" id="databaseFile" name="database" accept=".frm,.ibd,.myd,.myi,.ibdata,.pgsql,.pgdata,.sql,.pg_dump,.sqlite,.db,.sqlite3,.mdf,.ldf,.bak,.ndf,.log,.dbf,.ctl,.ibd">
+    </div>
+    <button type="submit" class="btn btn-primary">Upload</button>
+  </form>
+    <a href="{{ url_for('index') }}">Back</a>
+{% endblock %}

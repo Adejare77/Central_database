@@ -1,4 +1,5 @@
 #!/usr/bin/python3
+"""The Filter Module"""
 from app.database import CreateClassTable
 from sqlalchemy import text
 
