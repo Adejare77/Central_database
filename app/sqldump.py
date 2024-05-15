@@ -1,11 +1,19 @@
 #!/usr/bin/env python3
-
+"""Cleaning sqldump files"""
 import os
 import subprocess
 
-class DumpCleanUp:
 
+class DumpCleanUp:
+    """Clean the SQL dump uploaded for Processing"""
     def __init__(self, filename, db_name, full_path) -> None:
+        """Initializes the filenmae, database name and full path
+
+        Args:
+            filename (str): Actual database name given by user
+            db_name (str): Database name used for storage
+            full_path (str): path to the stored uploaded sqldump
+        """
         self.filename = filename
         self.db_path = full_path
         self.db_name = db_name
@@ -14,18 +22,25 @@ class DumpCleanUp:
 
     @property
     def copy_data(self):
+        """Copies original sqldump file for cleaning purpose"""
         try:
             self.path = os.path.join(self.db_path, "temp")
-            os.makedirs(self.path, exist_ok=True) # Creates a temp folder in Desktop
-            command = f'cp {self.db_path}/{self.filename} {self.path}/{self.db_name}.sql'
+            # Creates a temp folder in Desktop
+            os.makedirs(self.path, exist_ok=True)
+            command = f"""
+            cp {self.db_path}/{self.filename} {self.path}/{self.db_name}.sql
+            """
             subprocess.run(command, shell=True, check=True)
             self.fullpath = os.path.join(self.path, self.db_name + ".sql")
         except Exception as e:
-            print(f"** ERROR WHILE MAKING A COPY OF {self.db_name} TO TEMP FOLDER **")
+            print(f"** ERROR WHILE MAKING A COPY OF
+                  {self.db_name} TO TEMP FOLDER **")
 
     @property
     def cleanup(self):
+        """cleans the copied sqldump file"""
         try:
+            # Bash commands for cleaning sqldump files
             commands = f"""
             sed -i 's-\/\*[!]*\*\/--g' {self.fullpath};
             sed -i 's/--.*//g' {self.fullpath};
@@ -46,11 +61,17 @@ class DumpCleanUp:
             return None
 
     def dump_data(self, db_engine):
+        """
+        Try different DBMS to use for the sqldump file if db_engine is None.
+        Else use the DBMS provided by the user.
+        """
+        # Bash command for running DBMS
         rdbms = {
             "mysql+mysqldb": f"""
             echo 'DROP DATABASE IF EXISTS `{self.db_name}`' | mysql -p{os.getenv("SECRET_KEY")};
             echo 'CREATE DATABASE IF NOT EXISTS `{self.db_name}`' | mysql -p{os.getenv("SECRET_KEY")};
-            cat {self.fullpath} | mysql -p{os.getenv("SECRET_KEY")} {self.db_name};
+            cat {self.fullpath} | mysql -p{os.getenv(
+                "SECRET_KEY")} {self.db_name};
             """,
             "postgresql": f"""
             echo 'DROP DATABASE {self.db_name}' | psql;
@@ -68,22 +89,20 @@ class DumpCleanUp:
             }
             fmts = database[db_engine]
             try:
-                subprocess.check_output(rdbms[fmts], shell=True, stderr=subprocess.STDOUT)
+                subprocess.check_output(rdbms[fmts],
+                                        shell=True, stderr=subprocess.STDOUT)
                 return fmts
             except subprocess.CalledProcessError as e:
-                print("--------EXCEPT CALLED-------------")
                 print("The formats Given is: ", fmts)
-                print("--------EXCEPT CALLED-------------")
                 pass
 
         for fmts in rdbms.keys():
             try:
-                subprocess.check_output(rdbms[fmts], shell=True, stderr=subprocess.STDOUT)
+                subprocess.check_output(rdbms[fmts],
+                                        shell=True, stderr=subprocess.STDOUT)
                 return fmts
             except subprocess.CalledProcessError as e:
-                print("--------EXCEPT CALLED-------------")
                 print("The formats Called is: ", fmts)
-                print("--------EXCEPT CALLED-------------")
                 pass
 
         return None
