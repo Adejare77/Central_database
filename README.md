@@ -18,7 +18,7 @@
 
 ## Project Architecture
 
-![Relative Image](images/database-archi.png)
+![Relative Image](database-archi.png)
 
 
 ## Intallation
