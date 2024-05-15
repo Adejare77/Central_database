@@ -16,6 +16,11 @@
 - **Final Project Blog Article:**
 - **Author(s) LinkedIn:** (https://www.linkedin.com/in/okeleji-azeez-3441a1251/), (https://www.linkedin.com/in/Olulesho-Stephanie/) 
 
+## Project Architecture
+
+![Relative Image](app/static/images/database-archi.png)
+
+
 ## Intallation
 
 - **To install and run the Central Database Management application locally, follow these steps:**
