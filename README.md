@@ -13,8 +13,8 @@
 - **Central Database Management is a Flask application designed to manage users and their associated data in a centralized database system. The application provides a user-friendly interface for adding, deleting, and managing user accounts, as well as uploading and managing database files.**
 
 - **Deployed Site: Central Database Management**
-- **Final Project Blog Article: **
-- **Author(s) LinkedIn:** Okeleji Azeez, 
+- **Final Project Blog Article:**
+- **Author(s) LinkedIn:** (https://www.linkedin.com/in/okeleji-azeez-3441a1251/), (https://www.linkedin.com/in/Olulesho-Stephanie/) 
 
 ## Intallation
 
