@@ -5,7 +5,9 @@
 	    <h1>Create A New Database</h1>
 
         <form action="{{ url_for('submit_database_form') }}" method="post" enctype="multipart/form-data">
-            <label>Upload the Database/Directory: <input type="file" name="files[]" webkitdirectory mozdirectory /></label>
+            <label>Select a Database Name: <input type="text" name="filename" /></label>
+            <br>
+            <label>Select a sqldump file: <input type="file" name="uploaded_file" /></label>
             <br>
             <!-- Database Engine Selection -->
             <label for="db_engine">Database format:</label>
