@@ -11,7 +11,6 @@ database = {
     "postgresql": "PostgreSQL",
     "mariadb": "MariaDB",
     "sqlite": "SQLite",
-    "oracle": "Oracle",
     "microsoft": "MicroSoftSQL"
 }
 

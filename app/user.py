@@ -42,7 +42,7 @@ class MyUser():
         session.commit()
         session.close()
 
-    def check_folder(self, uploaded_files, filename):
+    def check_folder(self, uploaded_files, filename, db_engine=None):
         try:
             # filename = uploaded_files.filename
             home = os.path.expanduser("~/Desktop")
@@ -52,7 +52,7 @@ class MyUser():
             db_name = self.username + "_" + filename
             # uploaded_files.save(path)
             uploaded_files.save(os.path.join(central_db_path, filename))
-            returned_fmt = DumpCleanUp(filename, db_name, central_db_path).dump_data
+            returned_fmt = DumpCleanUp(filename, db_name, central_db_path).dump_data(db_engine)
             if not returned_fmt:
                 return False
             new_data = {returned_fmt: [filename, date.today().strftime("%Y-%m-%d")]}
