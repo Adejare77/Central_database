@@ -41,7 +41,7 @@
 	**Navigate to the "View" section to explore your database contents.**
 	**Use search and filter options to locate specific records quickly.**
 
-![Relative Image](index-2.jpg)
+![Relative Image](index-1.jpg)
 
 - **Adding Data:**
 	**Access the "Add" section to input new data entries into your database.**
@@ -59,7 +59,7 @@
 	**Utilize the sorting functionality to organize your database entries based on specific criteria.**
 	**Sort by date, name, or any other relevant attribute to streamline data management.**
 
-![Relative Image](index-1.jpg)
+![Relative Image](index-2.jpg)
 
 ## Contributing
 
