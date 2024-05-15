@@ -14,7 +14,7 @@
 
 - **Deployed Site: Central Database Management**
 - **Final Project Blog Article:**
-- **Author(s) LinkedIn:** (https://www.linkedin.com/in/okeleji-azeez-3441a1251/), (https://www.linkedin.com/in/Olulesho-Stephanie/) 
+- **Author(s) LinkedIn:** (https://www.linkedin.com/in/okeleji-azeez/), (https://www.linkedin.com/in/Olulesho-Stephanie/) (https://www.linkedin.com/in/Adejare-Abdulrasheed/)
 
 ## Project Architecture
 
@@ -41,6 +41,8 @@
 	**Navigate to the "View" section to explore your database contents.**
 	**Use search and filter options to locate specific records quickly.**
 
+![Relative Image](index-2.jpg)
+
 - **Adding Data:**
 	**Access the "Add" section to input new data entries into your database.**
 	**Follow the prompts to enter relevant information and save your changes.**
@@ -56,6 +58,8 @@
 - **Sorting Data:**
 	**Utilize the sorting functionality to organize your database entries based on specific criteria.**
 	**Sort by date, name, or any other relevant attribute to streamline data management.**
+
+![Relative Image](index-1.jpg)
 
 ## Contributing
 
@@ -79,7 +83,7 @@
 
 ### Security
 
--
+- **Password Hash**
 
 ### Database
 
