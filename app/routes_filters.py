@@ -63,22 +63,4 @@ def table_query(columns):
                   session['tables'], columns)
     return render_template('data.html', headers=inst.table_headers, data=inst.all_rows())
 
-# [ ]: Flask Route for AJAX Requests
-# @app.route('/user/database/dynamic_tblheaders', methods=['POST'])
-# def dynamic_data():
-#     """ flask route to handle AJAX requests"""
-#     selected_tables = (request.json)['selected_tables'] # recieves the list of selected tables sent from AJAX
-#     inst = Filter(current_user.id, session.get('database'), selected_tables)
-#     return jsonify({"headers":inst.table_headers, "route":"/user/database/cols_options"})
-
-
-
-
-# @app.route("/user/database/<del_tables>", methods=['GET'])
-# @login_required
-# def del_table(tables):
-#     inst = CreateClassTable(current_user.id, session.get('database')).del_table(tables)
-#     # return render_template('checkbox.html', data=all_inst_headers, route="/user/database/option",
-#     #                        name="columns")
-#     return redirect('/user/database/db')
 

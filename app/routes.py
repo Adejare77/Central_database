@@ -5,7 +5,6 @@ from app.forms import LoginForm
 from flask_login import current_user, login_user
 import sqlalchemy as sa
 from app import db
-""" from app.models import CentralDatabase """
 from app.forms import RegistrationForm
 from app.models import User
 from flask_login import logout_user
@@ -40,12 +39,14 @@ acceptable_format = {
 @app.route('/index')
 @login_required
 def index():
+    """Handles the index page"""
     db_list = Database(current_user.id).get_fmt_db_dt
     databases = db_list if db_list else [["None", "None", "None"]]
     return render_template('index.html', title='Home', headings=headings, databases=databases)
 
 @app.route('/login', methods=['GET', 'POST'])
 def login():
+    """Handles the user login page"""
     if current_user.is_authenticated:
         return redirect(url_for('index'))
     form = LoginForm()
@@ -64,11 +65,13 @@ def login():
 
 @app.route('/logout')
 def logout():
+    """Handles logout page"""
     logout_user()
     return redirect(url_for('index'))
 
 @app.route('/register', methods=['GET', 'POST'])
 def register():
+    """User registration"""
     if current_user.is_authenticated:
         return redirect(url_for('index'))
     form = RegistrationForm()
@@ -98,6 +101,7 @@ def before_request():
 @app.route('/edit_profile', methods=['GET', 'POST'])
 @login_required
 def edit_profile():
+    """Handles profile edit page"""
     form = EditProfileForm(current_user.username)
     if form.validate_on_submit():
         current_user.username = form.username.data
@@ -113,6 +117,7 @@ def edit_profile():
 
 @app.route('/reset_password_request', methods=['GET', 'POST'])
 def reset_password_request():
+    """password reset request page"""
     if current_user.is_authenticated:
         return redirect(url_for('index'))
     form = ResetPasswordRequestForm()
@@ -141,10 +146,6 @@ def reset_password(token):
         return redirect(url_for('login'))
     return render_template('reset_password.html', form=form)
 
-# # NOTE: NOT IN USE
-# @app.route('/database_details/<database_name>')
-# def database_details(database_name):
-#     return render_template('details.html')
 
 @app.route('/upload_database', methods=['GET', 'POST'])
 @login_required
@@ -155,6 +156,7 @@ def upload_database():
 @app.route('/delete_databases', methods=['GET', 'POST'])
 @login_required
 def delete_dbs():
+    """handles deleting of database"""
     if request.method == 'GET':
         db_list = Database(current_user.id).db_list
         if db_list:
