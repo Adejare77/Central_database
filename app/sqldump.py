@@ -25,15 +25,6 @@ class DumpCleanUp:
 
     @property
     def cleanup(self):
-        # sed -i 's-\/\*[!]*\*\/--g' {self.fullpath};
-        # sed -i 's/--.*//g' {self.fullpath};
-        # sed -i 's/CREATE DATABASE [^;]*//g' {self.fullpath};
-        # sed -i 's/DROP DATABASE [^;]*//g' {self.fullpath};
-        # sed -i 's/USE [^;]*//g' {self.fullpath};
-        # sed -i 's/CREATE USER [^;]*//g' {self.fullpath};
-        # sed -i 's/CREATE LOGIN [^;]*//g' {self.fullpath};
-        # sed -i 's/GRANT [^;]*//g' {self.fullpath}; # Newly added
-        # sed -i 's/^[\/]*SET [^;]*//g' {self.fullpath};
         try:
             commands = f"""
             sed -i 's-\/\*[!]*\*\/--g' {self.fullpath};

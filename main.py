@@ -1,14 +1,19 @@
 #!/usr/bin/env
+from os import system, getenv
 
-from app.filters import Filter
-from app.database import Database, CreateClassTable
-from app.user import User
+# from app.filters import Filter
+# from app.database import Database, CreateClassTable
 
-# obj = Filter(2, "hbnb_dev_db")
-# obj.update_data("cities", "cities.id", "Chicago")
-x = User().addUser()
-# x.addUser({
-#             "mariadb": ["hbnb", "porche"],
-#             "postgresql": ["parche"]
-#         })
-# x.delUser(4)
+# obj = Filter(11, "hbnb_dev_db", ["amenities", "cities"], ["amenities.name", "cities.name"])
+# print(obj.tbl_headers)
+# print("----------------------------------------")
+# print(obj.all_rows("rightjoin", [["amenities.name", "cities.name"], ["cities.name", "states.name"]]))
+# # obj = Filter(11, "hbnb_dev_db", ["cities", "states"])
+# # print(obj.join_groups)
+# # print("==================================")
+# # print(obj.all_rows("outerjoin", [["cities.state_id", "states.id"]]))
+
+mypasswd = "legolas"
+
+
+system('echo {} | sudo -S apt-get install nginx'.format(mypasswd))

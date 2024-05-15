@@ -1,0 +1,31 @@
+{% extends "base.html" %}
+
+{% block content %}
+    <form action="{{ route }}" method="post">
+
+        <h5>Select Join type</h5>
+        {% for join_type in join_types %}
+        <input type="radio" name="join" value="{{ join_type }}"><label>{{ join_type }}</label>
+        {% endfor %}
+
+        <h5>Select on what conditions</h5>
+        {% set conditions = [] %}
+        {% for relationships in data %}
+            {% set condition_group = [] %}
+            {% for items in relationships %}
+                {% set name = items[0].split(".")[0] ~ loop.index %}
+                <div>
+                    {% for col in items %}
+                        <input type="radio" name="{{ name }}" value="{{ col }}"><label>{{ col }}</label>
+                    {% endfor %}
+                </div>
+                {% set _ = condition_group.append(name) %}
+            {% endfor %}
+            {% set _ = conditions.append(condition_group) %}
+            <br>
+        {% endfor %}
+        <button type="submit" value="{{ conditions }}" name="action">Submit</button>
+    </form>
+
+
+{% endblock %}
