@@ -8,6 +8,9 @@ from app.database import Database
 from sqlalchemy.orm import sessionmaker
 from sqlalchemy import create_engine
 import os
+import subprocess
+from app.sqldump import DumpCleanUp
+from os import getenv
 from datetime import date
 
 class MyUser():
@@ -22,6 +25,9 @@ class MyUser():
         "oracle": ['.log', '.dbf', '.ctl'],
         "mariadb": ['.ibd', '.frm']
         }
+    server_path = {
+        "mysql+mysqldb": "/var/lib/mysql/",
+    }
     def __init__(self, id, username) -> None:
         url = 'mysql+mysqldb://{}:{}@{}:3306/{}'.format(\
             'my_user', 'my_user_passwd', 'localhost', 'central_db')
@@ -43,28 +49,24 @@ class MyUser():
         session.commit()
         session.close()
 
-    def check_folder(self, uploaded_files):
-        home = os.path.expanduser("~/Desktop")
-        central_db_dir = os.path.join(home, "central_db", self.username)
-        os.makedirs(central_db_dir, exist_ok=True)
-
-        # Extract directory name and file format
-        db_name = os.path.dirname(uploaded_files[0].filename)
-        file_extension = os.path.splitext(uploaded_files[0].filename)[1] # splits at "."
-
-        formats = MyUser.acceptable_format
-        for fmt in formats.keys():
-            if file_extension in formats[fmt]:
-                path = os.path.join(central_db_dir, db_name)
-                os.makedirs(path, exist_ok=True)
-                for files in uploaded_files:
-                    filename = files.filename.split('/')[-1]
-                    file_path = os.path.join(path, filename)
-                    files.save(file_path)
-                new_data = {fmt: [db_name, date.today().strftime("%Y-%m-%d")]}
-                Database(self.id).upload_data(**new_data)
-                return True
-        return False
+    def check_folder(self, uploaded_files, filename, db_engine=None):
+        try:
+            # filename = uploaded_files.filename
+            home = os.path.expanduser("~/Desktop")
+            central_db_path = os.path.join(home, "central_db", self.username)
+            os.makedirs(central_db_path, exist_ok=True)
+            # path = os.path.join(central_db_dir, filename)
+            db_name = self.username + "_" + filename
+            # uploaded_files.save(path)
+            uploaded_files.save(os.path.join(central_db_path, filename))
+            returned_fmt = DumpCleanUp(filename, db_name, central_db_path).dump_data(db_engine)
+            if not returned_fmt:
+                return False
+            new_data = {returned_fmt: [filename, date.today().strftime("%Y-%m-%d")]}
+            Database(self.id).upload_data(**new_data)
+            return True
+        except Exception as e:
+            return False
 
     def __del__(self):
         self.engine.dispose()

@@ -11,10 +11,8 @@ database = {
     "postgresql": "PostgreSQL",
     "mariadb": "MariaDB",
     "sqlite": "SQLite",
-    "oracle": "Oracle",
     "microsoft": "MicroSoftSQL"
 }
-
 
 class Database:
     """Initializes a database object with an ID and
@@ -98,12 +96,16 @@ class Database:
         if type(dbs) == str:
             dbs = list([dbs])
         url = Database.url
+        session = self.Session()
+        user = session.query(UserDatabase).filter_by(id=self.id).one().username
         engine = create_engine(url, pool_pre_ping=True)
         with engine.connect() as connection:
             for db in dbs:
-                query = f'DROP DATABASE IF EXISTS {db}'
+                dbase = user + "_" + db
+                query = f'DROP DATABASE IF EXISTS {dbase}'
                 connection.execute(text(query))
                 self.__del_central_database(db)
+        session.close()
         engine.dispose()
 
     def __del_central_database(self, db):
@@ -124,6 +126,11 @@ class Database:
         session.commit()
         session.close()
 
+    def user(self) -> str:
+        session = self.Session()
+        user = session.query(UserDatabase).filter_by(id = self.id).one().username
+        return user
+
     def __del__(self):
         """Cleans up resources when the object is deleted."""
         self.engine.dispose()
@@ -136,10 +143,15 @@ class CreateClassTable(Database):
     def __init__(self, id, db) -> None:
         super().__init__(id)
         self.db = db
+        if not self.get_fmt_db:
+            print("** COULDN'T FIND OR CONNECT TO DATABASE **")
+            return None
         for fmt in self.get_fmt_db.keys():
             self.fmt = fmt
+        username = self.user()
+        db = username + "_" + self.db
         url = "{}://{}:{}@localhost/{}".format(self.fmt,
-            getenv("USER"), getenv("SECRET_KEY"), self.db)
+            getenv("USER"), getenv("SECRET_KEY"), db)
         try:
             self.engine = create_engine(url, pool_pre_ping=True)
             self.engine.connect()
@@ -175,7 +187,8 @@ class CreateClassTable(Database):
 
     def get_tb_columns(self, tables=[]) -> list:
         tb_cls = self.tbl_cls
-        tb = [tb_cls[tbs] for tbs in tb_cls.keys() if tbs in tables]
+        # tb = [tb_cls[tbs] for tbs in tb_cls.keys() if tbs in tables]
+        tb = [tb_cls[tbs] for tbs in tables]
         columns = []
         for _cls in tb:
             tb_name = _cls.__table__
@@ -194,7 +207,6 @@ class CreateClassTable(Database):
             else:
                 tb = self.tbl_cls[table]
                 tb.__table__.drop(self.engine)
-
 
     def __del__(self):
         self.engine.dispose()

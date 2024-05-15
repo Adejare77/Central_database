@@ -150,7 +150,7 @@ def reset_password(token):
 @app.route('/upload_database', methods=['GET', 'POST'])
 @login_required
 def upload_database():
-    database_engines = ['None', 'MySQL', 'PostgreSQL', 'MariaDB']
+    database_engines = [None, 'MySQL', 'PostgreSQL', 'MariaDB']
     return render_template('database.html', title='Create Database', database_engines=database_engines)
 
 @app.route('/delete_databases', methods=['GET', 'POST'])
@@ -161,6 +161,8 @@ def delete_dbs():
         db_list = Database(current_user.id).db_list
         if db_list:
             return render_template('database.html', title='Delete Database', databases=db_list)
+        flash("No Database Uploaded Yet")
+        return redirect(url_for('index'))
     elif request.method == 'POST':
         selected_dbs = request.form.getlist('dbs')
         Database(current_user.id).del_database(selected_dbs)
@@ -170,7 +172,10 @@ def delete_dbs():
 @app.route('/submit_database_form', methods=['POST'])
 @login_required
 def submit_database_form():
-    uploaded_files = request.files.getlist('files[]')
-    check = MyUser(current_user.id, current_user.username).check_folder(uploaded_files)
+    uploaded_files = request.files.get('uploaded_file')
+    filename = request.form.get("filename")
+    db_engine = request.form.get("db_engine")
+    db_engine = None if db_engine == "None" else db_engine
+    check = MyUser(current_user.id, current_user.username).check_folder(uploaded_files, filename, db_engine)
     flash("File Successfully Uploaded") if check else flash("Failed to Upload file; Upload file with right RDB format")
     return redirect(url_for('index'))

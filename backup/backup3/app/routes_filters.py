@@ -1,5 +1,4 @@
 #!/usr/bin/python3
-""" module contains routing specifications for the query pages"""
 
 from flask import redirect, request, render_template, url_for, session
 from app.database import CreateClassTable
@@ -13,7 +12,6 @@ from flask import request
 @app.route("/user/database/<string:db>/", methods=['GET'])
 @login_required
 def table_lists(db):
-    """Handles GET requests for viewing a list of tables in a specific database"""
     session['database'] = db
     table_list = CreateClassTable(current_user.id, db).get_tb_list
     return render_template('checkbox.html', data=table_list, route="/user/database/table/tbls_options",
@@ -22,9 +20,6 @@ def table_lists(db):
 @app.route('/user/database/table/tbls_options', methods=['POST'])
 @login_required
 def table_options():
-    """handles control flow for POST requests for performing actions on
-    selected tables from the table list.
-    """
     option = request.form.get("action")
     selected_tables = request.form.getlist('table')
     if option == "Query":
@@ -32,11 +27,9 @@ def table_options():
     CreateClassTable(current_user.id, session.get('database')).del_table(selected_tables)
     return redirect(url_for('table_lists', db=session.get('database')))
 
-# [ ]: Route to replace with AJAx handler
 @app.route('/user/database/table_cols/<tables>', methods=['GET'])
 @login_required
 def table_columns(tables):
-    """returns list of columns in selected tables"""
     if not session.get('database'):
         return redirect(url_for('index'))
     tables = eval(tables)  # if received from url_for, always use eval
@@ -61,7 +54,6 @@ def columns_options():
 @app.route("/user/database/query/<columns>", methods=['GET', 'POST'])
 @login_required
 def table_query(columns):
-    """ route handles GET requests for executing and displaying a query  on the selected columns."""
     if not session.get('tables'):
         return redirect(url_for('index'))
     if len(session['tables']) == 1:
