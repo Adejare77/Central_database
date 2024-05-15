@@ -1,4 +1,5 @@
 #!/usr/bin/python3
+"""Central_database Database"""
 from sqlalchemy import create_engine, text
 from sqlalchemy.orm import sessionmaker
 from sqlalchemy.exc import OperationalError
@@ -14,13 +15,19 @@ database = {
     "microsoft": "MicroSoftSQL"
 }
 
+
 class Database:
-    """Initializes a database object with an ID and
-    establishes a connection to the database using SQLAlchemy
+    """Establishes connection with central_db using
     """
     url = "mysql+mysqldb://{}:{}@localhost:3306/{}".format(
         getenv("USER"), getenv("SECRET_KEY"), getenv("DATABASE"))
+
     def __init__(self, id) -> None:
+        """ Initializes instance id
+
+        Args:
+            id (int): unique id of an instance.
+        """
         self.id = id
         self.engine = create_engine(Database.url, pool_pre_ping=True)
         self.Session = sessionmaker(bind=self.engine)
@@ -31,7 +38,8 @@ class Database:
     def get_fmt_db_dt(self) -> list:
         """Retrieves formatted database details based on user ID"""
         session = self.Session()
-        fmt_db_dt = session.query(UserDatabase.db_list).filter_by(id=self.id).one()
+        fmt_db_dt = session.query(UserDatabase.db_list).filter_by(
+            id=self.id).one()
         if not fmt_db_dt[0]:
             session.close()
             return None
@@ -43,15 +51,18 @@ class Database:
         return fmt_eng_dt
 
     @property
-    def get_fmt_db_list(self) -> dict: # Returns {'fmt1': [db1, db2], 'fmt2': [db3]}
-        """Retrieves formatted database lists based on user ID."""
+    def get_fmt_db_list(self) -> dict:
+        """
+        Retrieves <{formatted: [[databases]]}> dictionary based on user ID.
+        """
         session = self.Session()
-        fmt_db_list = session.query(UserDatabase).filter_by(id=self.id).one().db_list
+        fmt_db_list = session.query(UserDatabase).filter_by(
+            id=self.id).one().db_list
         if not fmt_db_list:
             session.close()
             return None
         fmt_db_list_dict = {}
-        for key,val in fmt_db_list.items():
+        for key, val in fmt_db_list.items():
             values = []
             for element in val:
                 values.append(element[0])
@@ -64,7 +75,8 @@ class Database:
         """Retrieves a list of databases accessible to the user."""
         db_list = self.fmt_db_list
         if db_list:
-            db_list = [db for db in [db_list for db_list in self.fmt_db_list.values()]]
+            db_list = [db for db in
+                       [db_list for db_list in self.fmt_db_list.values()]]
             db_list = [db for dbs in self.fmt_db_list.values() for db in dbs]
             return db_list
         return None
@@ -72,7 +84,8 @@ class Database:
     def upload_data(self, **kwargs) -> list:
         """Uploads data to the specified database"""
         session = self.Session()
-        query = session.query(UserDatabase).filter_by(id=self.id).one().db_list
+        query = session.query(UserDatabase).filter_by(
+            id=self.id).one().db_list
         for key in kwargs.keys():
             key
         if not query:
@@ -82,12 +95,14 @@ class Database:
         else:
             if set(kwargs.keys()).issubset(query.keys()):
                 query[key].append(kwargs[key])
-                session.query(UserDatabase).filter_by(id=self.id).update({UserDatabase.db_list: query})
+                session.query(UserDatabase).filter_by(id=self.id).update(
+                    {UserDatabase.db_list: query})
 
             else:
                 query[key] = list([kwargs[key]])
 
-        session.query(UserDatabase).filter_by(id=self.id).update({UserDatabase.db_list: query})
+        session.query(UserDatabase).filter_by(id=self.id).update(
+            {UserDatabase.db_list: query})
         session.commit()
         session.close()
 
@@ -97,7 +112,8 @@ class Database:
             dbs = list([dbs])
         url = Database.url
         session = self.Session()
-        user = session.query(UserDatabase).filter_by(id=self.id).one().username
+        user = session.query(UserDatabase).filter_by(
+            id=self.id).one().username
         engine = create_engine(url, pool_pre_ping=True)
         with engine.connect() as connection:
             for db in dbs:
@@ -111,7 +127,8 @@ class Database:
     def __del_central_database(self, db):
         """Deletes databases associated with a user."""
         session = self.Session()
-        query = session.query(UserDatabase).filter_by(id=self.id).one().db_list
+        query = session.query(UserDatabase).filter_by(
+            id=self.id).one().db_list
         if not query:
             session.close()
             return None
@@ -122,13 +139,16 @@ class Database:
         for items in query[key]:
             if db in items:
                 query[key].remove(items)
-        session.query(UserDatabase).filter_by(id=self.id).update({UserDatabase.db_list: query})
+        session.query(UserDatabase).filter_by(id=self.id).update(
+            {UserDatabase.db_list: query})
         session.commit()
         session.close()
 
     def user(self) -> str:
+        """Returns the current user username"""
         session = self.Session()
-        user = session.query(UserDatabase).filter_by(id = self.id).one().username
+        user = session.query(UserDatabase).filter_by(
+            id=self.id).one().username
         return user
 
     def __del__(self):
@@ -150,8 +170,8 @@ class CreateClassTable(Database):
             self.fmt = fmt
         username = self.user()
         db = username + "_" + self.db
-        url = "{}://{}:{}@localhost/{}".format(self.fmt,
-            getenv("USER"), getenv("SECRET_KEY"), db)
+        url = "{}://{}:{}@localhost/{}".\
+            format(self.fmt, getenv("USER"), getenv("SECRET_KEY"), db)
         try:
             self.engine = create_engine(url, pool_pre_ping=True)
             self.engine.connect()
@@ -162,7 +182,10 @@ class CreateClassTable(Database):
         self.tbl_cls = self.get_tbl_cls
 
     @property
-    def get_fmt_db(self) -> dict:  # returns the specific fmt_db_list {'fmt': db}
+    def get_fmt_db(self) -> dict:
+        """
+        Returns the <format: db> of a specific database selected by the user
+        """
         fmt_db_list = self.fmt_db_list
         for fmt, db_list in fmt_db_list.items():
             if self.db in db_list:
@@ -173,19 +196,23 @@ class CreateClassTable(Database):
 
     @property
     def get_tbl_cls(self) -> dict:
+        """automatically generates classes associated with to a DB using PK"""
         Base = automap_base()
+        # Provides a list of tuples [(table_name, class)]
         Base.prepare(self.engine, reflect=True)
-        # Above provides a list of tuples [(table_name, class)]
-        table_cls_names = dict(Base.classes.items()) # to give in dict fmt
+        # Give the list in dictionary format
+        table_cls_names = dict(Base.classes.items())
         self.engine.dispose()
         return table_cls_names
 
     @property
     def get_tb_list(self) -> list:
+        """returns all tables of a selected DB"""
         tables = list(self.tbl_cls.keys())
         return tables
 
     def get_tb_columns(self, tables=[]) -> list:
+        """Return the columns available for given table(s) of a DB"""
         tb_cls = self.tbl_cls
         # tb = [tb_cls[tbs] for tbs in tb_cls.keys() if tbs in tables]
         tb = [tb_cls[tbs] for tbs in tables]
@@ -197,6 +224,7 @@ class CreateClassTable(Database):
         return columns
 
     def del_table(self, tables=[]):
+        """Delete one or more tables of a selected DB"""
         if not tables:
             return None
         if type(tables) == str:
@@ -209,4 +237,5 @@ class CreateClassTable(Database):
                 tb.__table__.drop(self.engine)
 
     def __del__(self):
+        """Dispose Engine"""
         self.engine.dispose()
