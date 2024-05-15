@@ -1,8 +1,10 @@
 {% extends "base.html" %}
 
 {% block content %}
+<div class="query-block">
+    <div class="query-container-1">
     {% if title == "Create Database" %}
-	    <h1>Create A New Database</h1>
+        <h1>Create A New Database</h1>
 
         <form action="{{ url_for('submit_database_form') }}" method="post" enctype="multipart/form-data">
             <label>Select a Database Name: <input type="text" name="filename" /></label>
@@ -32,6 +34,8 @@
             <button type="submit" name="submit_button">Delete</button>
             </form>
     {% endif %}
+    </div>
+</div>
 
     <!-- Database Cluster Form -->
 

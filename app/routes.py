@@ -177,3 +177,7 @@ def submit_database_form():
     check = MyUser(current_user.id, current_user.username).check_folder(uploaded_files, filename, db_engine)
     flash("File Successfully Uploaded") if check else flash("Failed to Upload file; Upload file with right RDB format")
     return redirect(url_for('index'))
+
+@app.route('/landing')
+def landing_page():
+    return render_template('landing.html')
