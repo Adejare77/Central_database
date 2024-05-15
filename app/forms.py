@@ -8,12 +8,14 @@ from app.models import User
 from wtforms import TextAreaField
 from wtforms.validators import Length
 
+
 class LoginForm(FlaskForm):
     """Handles user login form"""
     username = StringField('Username', validators=[DataRequired()])
     password = PasswordField('Password', validators=[DataRequired()])
     remember_me = BooleanField('Remember Me')
     submit = SubmitField('Sign In')
+
 
 class RegistrationForm(FlaskForm):
     """Handles user registration"""
@@ -38,6 +40,7 @@ class RegistrationForm(FlaskForm):
         if user is not None:
             raise ValidationError('Please use a different email address.')
 
+
 class EditProfileForm(FlaskForm):
     """handles users profile form"""
     username = StringField('Username', validators=[DataRequired()])
@@ -45,21 +48,27 @@ class EditProfileForm(FlaskForm):
     submit = SubmitField('Submit')
 
     def __init__(self, original_username, *args, **kwargs):
+        """initializes original_username"""
         super().__init__(*args, **kwargs)
         self.original_username = original_username
 
     def validate_username(self, username):
+        """validate the user's username"""
         if username.data != self.original_username:
             user = db.session.scalar(sa.select(User).where(
                 User.username == self.username.data))
             if user is not None:
                 raise ValidationError('Please use a different username.')
 
+
 class ResetPasswordRequestForm(FlaskForm):
+    """Handle the request for forgotten password form"""
     email = StringField('Email', validators=[DataRequired(), Email()])
     submit = SubmitField('Request Password Reset')
 
+
 class ResetPasswordForm(FlaskForm):
+    """Handles the Forgotten password"""
     password = PasswordField('Password', validators=[DataRequired()])
     password2 = PasswordField(
         'Repeat Password', validators=[DataRequired(), EqualTo('password')])
