@@ -1,39 +1,25 @@
+#!/usr/bin/python3
 """ Routing specifications for application"""
-from flask import render_template, flash, redirect, url_for
-from app import app
+from flask import render_template, flash, redirect, url_for, request
+from app import app, db
 from app.forms import LoginForm
 from flask_login import current_user, login_user
 import sqlalchemy as sa
-from app import db
 from app.forms import RegistrationForm
 from app.models import User
-from flask_login import logout_user
-from flask_login import login_required
-from flask import request, jsonify
+from flask_login import logout_user, login_required
 from urllib.parse import urlsplit
-from datetime import datetime, timezone, date
-from app.forms import EditProfileForm
+from datetime import datetime, timezone
+from app.forms import EditProfileForm, ResetPasswordForm
 from app.forms import ResetPasswordRequestForm
 from app.email import send_password_reset_email
-from app.forms import ResetPasswordForm
 from app.user import MyUser
-import os
-from app.database import Database, CreateClassTable
-
-
+from app.database import Database
 
 
 # NOTE: DUMMY DATA FOR DASHBOARD
 headings = ('Database', 'Engine', 'Date Created')
 
-acceptable_format = {
-    "mysql+mysqldb": ['.frm', '.ibd', '.myd', '.myi', '.ibdata'],
-    "postgresql": ['.pgsql', '.pgdata', '.sql', '.dump'],
-    "sqlite": ['.sqlite', '.db', '.sqlite3'],
-    "microsoft": ['.mdf', '.ldf', '.bak', '.ndf'],
-    "oracle": ['.log', '.dbf', '.ctl'],
-    "mariadb": ['.ibd', '.frm']
-    }
 
 @app.route('/')
 @app.route('/index')
@@ -42,7 +28,9 @@ def index():
     """Handles the index page"""
     db_list = Database(current_user.id).get_fmt_db_dt
     databases = db_list if db_list else [["None", "None", "None"]]
-    return render_template('index.html', title='Home', headings=headings, databases=databases)
+    return render_template('index.html', title='Home',
+                           headings=headings, databases=databases)
+
 
 @app.route('/login', methods=['GET', 'POST'])
 def login():
@@ -61,13 +49,16 @@ def login():
         if not next_page or urlsplit(next_page).netloc != '':
             next_page = url_for('index')
         return redirect(next_page)
-    return render_template('login.html', title='Sign In', form=form, current_template='login.html')
+    return render_template('login.html', title='Sign In',
+                           form=form, current_template='login.html')
+
 
 @app.route('/logout')
 def logout():
     """Handles logout page"""
     logout_user()
     return redirect(url_for('index'))
+
 
 @app.route('/register', methods=['GET', 'POST'])
 def register():
@@ -83,7 +74,9 @@ def register():
         MyUser(user.id, user.username).addUser()
         flash('Congratulations, you are now a registered user!')
         return redirect(url_for('login'))
-    return render_template('register.html', title='Register', form=form, current_template='register.html')
+    return render_template('register.html', title='Register',
+                           form=form, current_template='register.html')
+
 
 @app.route('/user/<username>')
 @login_required
@@ -92,11 +85,14 @@ def user(username):
     # session['username'] = user
     return render_template('user.html', user=user)
 
+
 @app.before_request
 def before_request():
+    """called for every request"""
     if current_user.is_authenticated:
         current_user.last_seen = datetime.now(timezone.utc)
         db.session.commit()
+
 
 @app.route('/edit_profile', methods=['GET', 'POST'])
 @login_required
@@ -115,6 +111,7 @@ def edit_profile():
     return render_template('edit_profile.html', title='Edit Profile',
                            form=form)
 
+
 @app.route('/reset_password_request', methods=['GET', 'POST'])
 def reset_password_request():
     """password reset request page"""
@@ -131,8 +128,10 @@ def reset_password_request():
     return render_template('reset_password_request.html',
                            title='Reset Password', form=form)
 
+
 @app.route('/reset_password/<token>', methods=['GET', 'POST'])
 def reset_password(token):
+    """handles forgotten password"""
     if current_user.is_authenticated:
         return redirect(url_for('index'))
     user = User.verify_reset_password_token(token)
@@ -150,8 +149,11 @@ def reset_password(token):
 @app.route('/upload_database', methods=['GET', 'POST'])
 @login_required
 def upload_database():
+    """Handles the form where sqldump file is uploaded"""
     database_engines = [None, 'MySQL', 'PostgreSQL', 'MariaDB']
-    return render_template('database.html', title='Create Database', database_engines=database_engines)
+    return render_template('database.html', title='Create Database',
+                           database_engines=database_engines)
+
 
 @app.route('/delete_databases', methods=['GET', 'POST'])
 @login_required
@@ -160,7 +162,8 @@ def delete_dbs():
     if request.method == 'GET':
         db_list = Database(current_user.id).db_list
         if db_list:
-            return render_template('database.html', title='Delete Database', databases=db_list)
+            return render_template('database.html',
+                                   title='Delete Database', databases=db_list)
         flash("No Database Uploaded Yet")
         return redirect(url_for('index'))
     elif request.method == 'POST':
@@ -169,13 +172,17 @@ def delete_dbs():
         flash("Database(s) Successfully Deleted")
         return redirect(url_for('index'))
 
+
 @app.route('/submit_database_form', methods=['POST'])
 @login_required
 def submit_database_form():
+    """handles the uploaded sqldump file once it has been uploaded"""
     uploaded_files = request.files.get('uploaded_file')
     filename = request.form.get("filename")
     db_engine = request.form.get("db_engine")
     db_engine = None if db_engine == "None" else db_engine
-    check = MyUser(current_user.id, current_user.username).check_folder(uploaded_files, filename, db_engine)
-    flash("File Successfully Uploaded") if check else flash("Failed to Upload file; Upload file with right RDB format")
+    check = MyUser(current_user.id, current_user.username).check_folder(
+        uploaded_files, filename, db_engine)
+    flash("File Successfully Uploaded") if check else flash(
+        "Failed to Upload file; Upload file with right RDB format")
     return redirect(url_for('index'))
