@@ -164,7 +164,9 @@ class CreateClassTable(Database):
         super().__init__(id)
         self.db = db
         if not self.get_fmt_db:
+            print("=============================================")
             print("** COULDN'T FIND OR CONNECT TO DATABASE **")
+            print("=============================================")
             return None
         for fmt in self.get_fmt_db.keys():
             self.fmt = fmt
@@ -176,7 +178,9 @@ class CreateClassTable(Database):
             self.engine = create_engine(url, pool_pre_ping=True)
             self.engine.connect()
         except OperationalError:
+            print("==================================================")
             print("** COULD NOT CONNECT TO THE SELECTED DATABASE **")
+            print("==================================================")
             return
         self.Session = sessionmaker(bind=self.engine)
         self.tbl_cls = self.get_tbl_cls
@@ -231,7 +235,9 @@ class CreateClassTable(Database):
             tables = list([tables])
         for table in tables:
             if not self.tbl_cls.get(table):
+                print("===============================")
                 print(f"{table} Doesn't Exist")
+                print("===============================")
             else:
                 tb = self.tbl_cls[table]
                 tb.__table__.drop(self.engine)

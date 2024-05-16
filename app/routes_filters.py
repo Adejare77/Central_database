@@ -61,6 +61,7 @@ def columns_options():
         return redirect(url_for('index'))
     option = request.form.get("action")
     columns = request.form.getlist('columns')
+    session['columns'] = columns
     if option == "Query":
         return redirect(url_for('table_query', columns=columns))
     Filter(current_user.id, session.get('database'),
@@ -79,7 +80,9 @@ def table_query(columns):
         inst = Filter(current_user.id, session.get('database'),
                       session['tables'], eval(columns))
         headers = inst.table_headers(session['tables'],
-                                     eval(session.get('columns')))
+                                     session.get('columns'))
+        # headers = inst.table_headers(session['tables'],
+        #                              eval(session.get('columns')))
         return render_template('data.html', headers=headers,
                                data=inst.all_rows(),
                                back=session.get('database'))

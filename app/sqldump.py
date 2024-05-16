@@ -33,7 +33,7 @@ class DumpCleanUp:
             subprocess.run(command, shell=True, check=True)
             self.fullpath = os.path.join(self.path, self.db_name + ".sql")
         except Exception as e:
-            print(f"** ERROR WHILE MAKING A COPY OF
+            print(f"** ERROR WHILE MAKING A COPY OF \
                   {self.db_name} TO TEMP FOLDER **")
 
     @property
