@@ -93,16 +93,23 @@ class DumpCleanUp:
                                         shell=True, stderr=subprocess.STDOUT)
                 return fmts
             except subprocess.CalledProcessError as e:
+                print("================================")
                 print("The formats Given is: ", fmts)
+                print("================================")
                 pass
 
+        count = 0
         for fmts in rdbms.keys():
+            print("FORMAT IS:", fmts)
+            print("COUNT VALUE IS:", count)
             try:
                 subprocess.check_output(rdbms[fmts],
                                         shell=True, stderr=subprocess.STDOUT)
                 return fmts
             except subprocess.CalledProcessError as e:
+                print("==================================")
                 print("The formats Called is: ", fmts)
-                pass
-
+                print("==================================")
+            count += 1
+        print("*******FOR LOOP ENDED *************")
         return None

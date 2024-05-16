@@ -55,12 +55,18 @@ class MyUser():
             db_name = self.username + "_" + filename
             uploaded_files.save(os.path.join(central_db_path, filename))
             returned_fmt = DumpCleanUp(filename, db_name, central_db_path).dump_data(db_engine)
+            print("===========================================")
+            print("The DumpCleanUp returned: ", returned_fmt)
+            print("===========================================")
             if not returned_fmt:
                 return False
             new_data = {returned_fmt: [filename, date.today().strftime("%Y-%m-%d")]}
             Database(self.id).upload_data(**new_data)
             return True
         except Exception as e:
+            print("=================================")
+            print("** COULDN'T UPLOAD THE FILE **")
+            print("=================================")
             return False
 
     def __del__(self):
