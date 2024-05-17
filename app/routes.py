@@ -14,7 +14,7 @@ from app.forms import EditProfileForm, ResetPasswordForm
 from app.forms import ResetPasswordRequestForm
 from app.email import send_password_reset_email
 from app.user import MyUser
-from app.database import Database
+from app.database import Database, CreateClassTable
 
 
 # NOTE: DUMMY DATA FOR DASHBOARD

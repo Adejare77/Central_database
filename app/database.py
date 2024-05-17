@@ -6,6 +6,7 @@ from sqlalchemy.exc import OperationalError
 from app.central_db_tables import UserDatabase
 from sqlalchemy.ext.automap import automap_base
 from os import getenv
+import subprocess
 
 database = {
     "mysql+mysqldb": "MySQL",
@@ -106,23 +107,60 @@ class Database:
         session.commit()
         session.close()
 
+    # def del_database(self, dbs):
+    #     """Deletes specified databases."""
+    #     if type(dbs) == str:
+    #         dbs = list([dbs])
+    #     url = Database.url
+    #     session = self.Session()
+    #     user = session.query(UserDatabase).filter_by(
+    #         id=self.id).one().username
+    #     engine = create_engine(url, pool_pre_ping=True)
+    #     with engine.connect() as connection:
+    #         for db in dbs:
+    #             dbase = user + "_" + db
+    #             query = f'DROP DATABASE IF EXISTS {dbase}'
+    #             connection.execute(text(query))
+    #             self.__del_central_database(db)
+    #     session.close()
+    #     engine.dispose()
+
+    def get_db_fmt_only(self, db) -> str:
+        """Retrieves only the format of a given database"""
+        fmt_db_list = self.fmt_db_list
+        for fmt, db_list in fmt_db_list.items():
+            if db in db_list:
+                return fmt
+
     def del_database(self, dbs):
         """Deletes specified databases."""
         if type(dbs) == str:
             dbs = list([dbs])
-        url = Database.url
         session = self.Session()
         user = session.query(UserDatabase).filter_by(
             id=self.id).one().username
-        engine = create_engine(url, pool_pre_ping=True)
-        with engine.connect() as connection:
-            for db in dbs:
-                dbase = user + "_" + db
-                query = f'DROP DATABASE IF EXISTS {dbase}'
-                connection.execute(text(query))
-                self.__del_central_database(db)
         session.close()
-        engine.dispose()
+        for db in dbs:
+            dbase = user + "_" + db
+            fmt = self.get_db_fmt_only(db)
+            command = self.del_db_engine(fmt, dbase)
+            try:
+                subprocess.run(command, shell=True, check=True)
+                self.__del_central_database(db)
+            except subprocess.CalledProcessError:
+                print("===================================")
+                print("** COULD NOT DELETE DATABASE **")
+                print("===================================")
+                return
+
+    def del_db_engine(self, fmt, db):
+        db_engine = {
+            "mysql+mysqldb": f"""
+            echo 'DROP DATABASE IF EXISTS {db}' | mysql -p{getenv("SECRET_KEY")}""",
+            "postgresql": f"""
+            echo 'DROP DATABASE IF EXISTS {db}' | psql;"""
+        }
+        return db_engine[fmt]
 
     def __del_central_database(self, db):
         """Deletes databases associated with a user."""

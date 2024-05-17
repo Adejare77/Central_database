@@ -28,7 +28,7 @@ class DumpCleanUp:
             # Creates a temp folder in Desktop
             os.makedirs(self.path, exist_ok=True)
             command = f"""
-            cp {self.db_path}/{self.filename} {self.path}/{self.db_name}.sql
+            cp {self.db_path}/{self.filename}.sql {self.path}/{self.db_name}.sql
             """
             subprocess.run(command, shell=True, check=True)
             self.fullpath = os.path.join(self.path, self.db_name + ".sql")
@@ -65,51 +65,48 @@ class DumpCleanUp:
         Try different DBMS to use for the sqldump file if db_engine is None.
         Else use the DBMS provided by the user.
         """
-        # Bash command for running DBMS
-        rdbms = {
-            "mysql+mysqldb": f"""
-            echo 'DROP DATABASE IF EXISTS `{self.db_name}`' | mysql -p{os.getenv("SECRET_KEY")};
-            echo 'CREATE DATABASE IF NOT EXISTS `{self.db_name}`' | mysql -p{os.getenv("SECRET_KEY")};
-            cat {self.fullpath} | mysql -p{os.getenv(
-                "SECRET_KEY")} {self.db_name};
-            """,
-            "postgresql": f"""
-            echo 'DROP DATABASE {self.db_name}' | psql;
-            echo 'CREATE DATABASE {self.db_name}' | psql;
-            cat {self.fullpath} | psql -d {self.db_name};
-            """
-            # rm -r {self.path};
-        }
-        if db_engine:
-            database = {
-                "MySQL": "mysql+mysqldb",
-                "MariaDB": "mysql+mysqldb",
-                "PostgreSQL": "postgresql",
-                "Microsoft SQL Server": "microsoft"
-            }
-            fmts = database[db_engine]
-            try:
-                subprocess.check_output(rdbms[fmts],
-                                        shell=True, stderr=subprocess.STDOUT)
-                return fmts
-            except subprocess.CalledProcessError as e:
-                print("================================")
-                print("The formats Given is: ", fmts)
-                print("================================")
-                pass
+        #     # rm -r {self.path};
 
-        count = 0
-        for fmts in rdbms.keys():
-            print("FORMAT IS:", fmts)
-            print("COUNT VALUE IS:", count)
+        # rdbms = ["postgresql", "mysql+mysqldb"]
+        rdbms = ["mysql+mysqldb", "postgresql"]
+
+        for fmts in rdbms:
             try:
-                subprocess.check_output(rdbms[fmts],
-                                        shell=True, stderr=subprocess.STDOUT)
+                # output = subprocess.run(
+                #     self.db_engine(fmts, "Create"), shell=True, check=True,
+                #     capture_output=True, text=True)
+                output = subprocess.run(
+                    self.db_engine(fmts, "Create"), shell=True, check=True,
+                    capture_output=True, text=True)
                 return fmts
             except subprocess.CalledProcessError as e:
-                print("==================================")
-                print("The formats Called is: ", fmts)
-                print("==================================")
-            count += 1
-        print("*******FOR LOOP ENDED *************")
+                subprocess.run(self.db_engine(fmts, "Delete"),
+                               shell=True, check=True)
+
+            except Exception as e:
+                subprocess.run(self.db_engine(fmts, "Delete"),
+                               shell=True, check=True)
         return None
+
+    def db_engine(self, fmt, action):
+        engines = {
+              "mysql+mysqldb": {
+                "Create": f"""
+                echo 'DROP DATABASE IF EXISTS `{self.db_name}`' | mysql -p{os.getenv("SECRET_KEY")};
+                echo 'CREATE DATABASE IF NOT EXISTS `{self.db_name}`' | mysql -p{os.getenv("SECRET_KEY")};
+                cat {self.fullpath} | mysql -p{os.getenv(
+                "SECRET_KEY")} {self.db_name};
+                rm -r {self.path}""",
+                "Delete": f"""
+                echo 'DROP DATABASE IF EXISTS `{self.db_name}`' | mysql -p{os.getenv("SECRET_KEY")};"""
+            },
+            "postgresql": {
+                "Create": f"""
+                echo 'CREATE DATABASE {self.db_name}' | psql;
+                psql -d {self.db_name} -f {self.fullpath};
+                rm -r {self.path}""",
+                "Delete": f"""
+                echo 'DROP DATABASE {self.db_name}' | psql;"""
+            }
+        }
+        return engines[fmt][action]

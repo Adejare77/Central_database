@@ -24,7 +24,7 @@ class MyUser():
             id (int): The unique user's id
             username (_type_): The unique user's username
         """
-        url = 'mysql+mysqldb://{}:{}@{}:3306/{}'.format(\
+        url = 'mysql+mysqldb://{}:{}@{}:3306/{}'.format(
             'my_user', 'my_user_passwd', 'localhost', 'central_db')
         self.id = id
         self.username = username
@@ -53,14 +53,14 @@ class MyUser():
             central_db_path = os.path.join(home, "central_db", self.username)
             os.makedirs(central_db_path, exist_ok=True)
             db_name = self.username + "_" + filename
-            uploaded_files.save(os.path.join(central_db_path, filename))
-            returned_fmt = DumpCleanUp(filename, db_name, central_db_path).dump_data(db_engine)
-            print("===========================================")
-            print("The DumpCleanUp returned: ", returned_fmt)
-            print("===========================================")
+            uploaded_files.save(os.path.join(central_db_path,
+                                             filename + ".sql"))
+            returned_fmt = DumpCleanUp(filename, db_name,
+                                       central_db_path).dump_data(db_engine)
             if not returned_fmt:
                 return False
-            new_data = {returned_fmt: [filename, date.today().strftime("%Y-%m-%d")]}
+            new_data = {returned_fmt:
+                        [filename, date.today().strftime("%Y-%m-%d")]}
             Database(self.id).upload_data(**new_data)
             return True
         except Exception as e:
