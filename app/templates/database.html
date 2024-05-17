@@ -2,36 +2,45 @@
 
 {% block content %}
 <div class="query-block">
-    <div class="query-container-1">
+    <div  class="query-wrapper">
     {% if title == "Create Database" %}
-        <h1>Create A New Database</h1>
+    
+    <form action="{{ url_for('submit_database_form') }}" method="post" enctype="multipart/form-data" class="query-container-1">
+            <h1>Create A New Database</h1>
+            <div class="form-field">
 
-        <form action="{{ url_for('submit_database_form') }}" method="post" enctype="multipart/form-data">
-            <label>Select a Database Name: <input type="text" name="filename" /></label>
-            <br>
-            <label>Select a sqldump file: <input type="file" name="uploaded_file" /></label>
-            <br>
+                <label>Select a Database Name: <input type="text" name="filename"/></label> 
+            </div>
+            <!-- <br> -->
+            <div class="form-field">
+
+                <label>Select a sqldump file: <input type="file" name="uploaded_file" /></label>
+            </div>
+            <div class="form-field">
+
+                <label for="db_engine">Database format:</label>
+                <select id="db_engine" name="db_engine" required>
+                    {% for engine in database_engines %}
+                    <option value="{{ engine }}">{{ engine }}</option>
+                    {% endfor %}
+                </select>
+            </div>
+            <!-- <br> -->
             <!-- Database Engine Selection -->
-            <label for="db_engine">Database format:</label>
-            <select id="db_engine" name="db_engine" required>
-                {% for engine in database_engines %}
-                <option value="{{ engine }}">{{ engine }}</option>
-                {% endfor %}
-            </select>
-            <br>
+            <!-- <br> -->
             <!-- Submit Button -->
-            <button type="submit">Upload Database</button>
+            <button type="submit" class="btn btn-create">Upload Database</button>
         </form>
     {% else %}
         <h1>Delete Database(s)</h2>
-        <form action="{{ url_for('delete_dbs') }}" method="POST">
+        <form action="{{ url_for('delete_dbs') }}" method="POST" class="query-container-1">
             <dl>
                 <dt>Please check Database(s) to be Deleted</dt>
                 {% for item in databases %}
                 <dd><input type="checkbox" value="{{ item }}" name='dbs'><label>{{ item }}</label></dd>
                 {% endfor %}
             </dl>
-            <button type="submit" name="submit_button">Delete</button>
+            <button type="submit" name="submit_button" class="btn btn-create">Delete</button>
             </form>
     {% endif %}
     </div>
