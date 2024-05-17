@@ -39,14 +39,15 @@ nav a{
     font-family: "Fjalla One";
     font-size: x-large;
     margin: 0.5rem;
-    padding: 10px;
+    padding: 0.5rem;
+    transition: 0.2s;
 
 }
 
 nav a:hover{
     color: rgb(200,164,91);
     border-bottom: 0.1rem solid rgb(202,164,91);
-    padding: 0.5rem;
+    padding: 0.25rem;
 }
 
 section{
@@ -245,12 +246,16 @@ margin-top: 30px;
     /* color: #cccccc; */
     color: rgb(20,34,60);
     font-size: x-large;
+    /* margin: 0 4px; */
+    padding: 0.5rem;
+    transition: 0.2s;
 }
 
 #about a:hover{
     color:  rgb(20,34,60);;
-    border-bottom: 0.1rem solid  rgb(20,34,60);
-    padding: 0.02rem;
+    /* border-bottom: 0.1rem solid  rgb(20,34,60); */
+    padding: 0.25rem;
+    /* margin: 0 4px; */
 }
 
 
