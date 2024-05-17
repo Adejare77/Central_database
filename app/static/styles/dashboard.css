@@ -18,6 +18,12 @@ h2{
     font-weight:700;
 }
 
+.db-actions{
+    width: 250px;
+    display: flex;
+    justify-content: space-between;
+}
+
 .dash .btn-create{
     background-color: rgb(167,190,211);
     border: 0.5px solid #f9f9f9d7;
