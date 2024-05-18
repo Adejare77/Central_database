@@ -218,6 +218,7 @@ class CreateClassTable(Database):
         except OperationalError:
             print("==================================================")
             print("** COULD NOT CONNECT TO THE SELECTED DATABASE **")
+            print(url)
             print("==================================================")
             return
         self.Session = sessionmaker(bind=self.engine)

@@ -38,8 +38,10 @@ class Filter(CreateClassTable):
             columns = list([columns])
         all_tbl_headers = self.get_tb_columns(tables)
         if columns:
-            selected_headers = [col for col in columns
-                                if col in all_tbl_headers]
+            # selected_headers = [col for col in columns
+            #                     if col in all_tbl_headers]
+            selected_headers = [col for col in all_tbl_headers
+                                if col in columns]
             return selected_headers
         self.columns = all_tbl_headers
         return all_tbl_headers
@@ -71,14 +73,17 @@ class Filter(CreateClassTable):
         data = []
         query = session.query(*tbl_clss)
         for i in range(1, len(self.tb)):
-            join_method = getattr(query, join_type)
+            join_method = getattr(query, "join")
+            value = False
+            if join_type == "left join" or join_type == "right join":
+                value = True
             # where conditions e.g [["states.id", "cities.id"],
             # ["amenities.id", "places.amenity_id"]].
             # e.g ["states.id". "cities.state_id"]
             condition = conditions[i - 1]
             left = getattr(tbl_clss[i-1], condition[0].split(".")[1])
             right = getattr(tbl_clss[i], condition[1].split(".")[1])
-            query = join_method(tbl_clss[i], left == right)
+            query = join_method(tbl_clss[i], left == right, isouter=value)
 
         query = query.all()
         for row in query:

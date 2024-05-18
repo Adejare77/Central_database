@@ -20,7 +20,8 @@ def table_lists(db):
     table_list = CreateClassTable(current_user.id, db).get_tb_list
     return render_template('checkbox.html',
                            data=table_list, name="table",
-                           route="/user/database/table/tbls_options")
+                           route="/user/database/table/tbls_options",
+                           description="Please select TABLE(s) to be Displayed")
 
 
 @app.route('/user/database/table/tbls_options', methods=['POST'])
@@ -50,7 +51,8 @@ def table_columns(tables):
     headers = inst.table_headers(tables, None)
     return render_template('checkbox.html', data=headers,
                            route="/user/database/table_cols/cols_options",
-                           name="columns")
+                           name="columns",
+                           description="Please select COLUMNS to display")
 
 
 @app.route('/user/database/table_cols/cols_options', methods=['POST'])
@@ -76,19 +78,21 @@ def table_query(columns):
     a query on the selected columns."""
     if not session.get('tables'):
         return redirect(url_for('index'))
+
     if len(session['tables']) == 1:
         inst = Filter(current_user.id, session.get('database'),
                       session['tables'], eval(columns))
         headers = inst.table_headers(session['tables'],
                                      session.get('columns'))
-        # headers = inst.table_headers(session['tables'],
-        #                              eval(session.get('columns')))
         return render_template('data.html', headers=headers,
                                data=inst.all_rows(),
                                back=session.get('database'))
+
     if request.method == 'GET':
-        join_types = ["join"]
-        session['columns'] = str(columns)
+        join_types = ["join", "left join", "right join"]
+        if len(session['tables']) > 2:
+            join_types.remove('right join')
+        # session['columns'] = columns
         inst = Filter(current_user.id, session.get('database'),
                       session['tables'], eval(columns))
         return render_template('radio.html', join_types=join_types,
@@ -96,10 +100,19 @@ def table_query(columns):
                                route="/user/database/query/" + columns)
 
     join_type = request.form.get('join')
+    tables = session['tables']
+    if join_type == "right join":
+        tables = session['tables']
+        tables = list([tables[1], tables[0]])
+
+    # inst = Filter(current_user.id, session.get('database'),
+    #               session['tables'], (eval(session.get('columns'))))
     inst = Filter(current_user.id, session.get('database'),
-                  session['tables'], (eval(session.get('columns'))))
-    headers = inst.table_headers(session['tables'],
-                                 eval(session.get('columns')))
+                  tables, eval(columns))
+    # headers = inst.table_headers(tables,
+    #                              eval(session.get('columns')))
+    headers = inst.table_headers(tables,
+                                 eval(columns))
     condition_keys = eval(request.form.get('action'))  # eval converts to list
     conditions = []
     for items in condition_keys:
@@ -107,6 +120,9 @@ def table_query(columns):
         for element in items:
             group_conditions.append(request.form.get(element))
         conditions.append(group_conditions)
+
+    if join_type == "right join":
+        conditions = [list([conditions[0][1], conditions[0][0]])]
 
     return render_template('data.html', headers=headers,
                            data=inst.all_rows(join_type, conditions),

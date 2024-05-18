@@ -8,6 +8,7 @@ from app.database import Database
 from sqlalchemy.orm import sessionmaker
 from sqlalchemy import create_engine
 import os
+import subprocess
 from app.sqldump import DumpCleanUp
 from datetime import date
 
@@ -57,6 +58,12 @@ class MyUser():
                                              filename + ".sql"))
             returned_fmt = DumpCleanUp(filename, db_name,
                                        central_db_path).dump_data(db_engine)
+            temp_folder = os.path.join(central_db_path, "temp")
+            if os.path.exists(temp_folder):
+                subprocess.run(f'rm -r {temp_folder}', check=True, shell=True)
+            # print("*************************")
+            # print(returned_fmt)
+            # print("*************************")
             if not returned_fmt:
                 return False
             new_data = {returned_fmt:
@@ -67,6 +74,8 @@ class MyUser():
             print("=================================")
             print("** COULDN'T UPLOAD THE FILE **")
             print("=================================")
+            if os.path.exists(temp_folder):
+                subprocess.run(f'rm -r {temp_folder}', check=True, shell=True)
             return False
 
     def __del__(self):
