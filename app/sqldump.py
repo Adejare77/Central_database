@@ -45,7 +45,7 @@ class DumpCleanUp:
             sed -i 's-\/\*[!]*\*\/--g' {self.fullpath};
             sed -i 's/--.*//g' {self.fullpath};
             sed -i 's/CREATE DATABASE [^;]*[;]*//g' {self.fullpath};
-            sed -i 's/DROP DATABASE [^;]*[;]*//g' {self.fullpath};
+            sed -i 's/DROP [^;]*[;]*//g' {self.fullpath};
             sed -i 's/USE [^;]*[;]*//g' {self.fullpath};
             sed -i 's/CREATE USER [^;]*[;]*//g' {self.fullpath};
             sed -i 's/CREATE LOGIN [^;]*[;]*//g' {self.fullpath};
@@ -65,25 +65,51 @@ class DumpCleanUp:
         Try different DBMS to use for the sqldump file if db_engine is None.
         Else use the DBMS provided by the user.
         """
-        #     # rm -r {self.path};
+        rdbms = {
+            "MySQL": "mysql+mysqldb",
+            "PostgreSQL": "postgresql"
+            }
+        if db_engine:
+            try:
+                output = subprocess.run(
+                    self.db_engine(rdbms[db_engine], "Create"), shell=True, check=True,
+                    capture_output=True, text=True)
+                return rdbms[db_engine]
+            except subprocess.CalledProcessError as e:
+                print("******* SUBPROCESS ERROR **********")
+                print(e)
+                print("******* SUBPROCESS ERROR **********")
+                subprocess.run(self.db_engine(fmts, "Delete"),
+                               shell=True, check=True)
+
+            except Exception as e:
+                print("******* EXCEPTION ERROR **********")
+                print(e)
+                print("******* EXCEPTION ERROR **********")
+                subprocess.run(self.db_engine(fmts, "Delete"),
+                               shell=True, check=True)
+
 
         # rdbms = ["postgresql", "mysql+mysqldb"]
         rdbms = ["mysql+mysqldb", "postgresql"]
 
         for fmts in rdbms:
             try:
-                # output = subprocess.run(
-                #     self.db_engine(fmts, "Create"), shell=True, check=True,
-                #     capture_output=True, text=True)
                 output = subprocess.run(
                     self.db_engine(fmts, "Create"), shell=True, check=True,
                     capture_output=True, text=True)
                 return fmts
             except subprocess.CalledProcessError as e:
+                print("******* SUBPROCESS ERROR **********")
+                print(e)
+                print("******* SUBPROCESS ERROR **********")
                 subprocess.run(self.db_engine(fmts, "Delete"),
                                shell=True, check=True)
 
             except Exception as e:
+                print("******* EXCEPTION ERROR **********")
+                print(e)
+                print("******* EXCEPTION ERROR **********")
                 subprocess.run(self.db_engine(fmts, "Delete"),
                                shell=True, check=True)
         return None
@@ -91,22 +117,21 @@ class DumpCleanUp:
     def db_engine(self, fmt, action):
         engines = {
               "mysql+mysqldb": {
-                "Create": f"""
-                echo 'DROP DATABASE IF EXISTS `{self.db_name}`' | mysql -p{os.getenv("SECRET_KEY")};
-                echo 'CREATE DATABASE IF NOT EXISTS `{self.db_name}`' | mysql -p{os.getenv("SECRET_KEY")};
-                cat {self.fullpath} | mysql -p{os.getenv(
-                "SECRET_KEY")} {self.db_name};
-                rm -r {self.path}""",
-                "Delete": f"""
-                echo 'DROP DATABASE IF EXISTS `{self.db_name}`' | mysql -p{os.getenv("SECRET_KEY")};"""
-            },
-            "postgresql": {
-                "Create": f"""
-                echo 'CREATE DATABASE {self.db_name}' | psql;
-                psql -d {self.db_name} -f {self.fullpath};
-                rm -r {self.path}""",
-                "Delete": f"""
-                echo 'DROP DATABASE {self.db_name}' | psql;"""
-            }
+                  "Create": f"""
+                  echo 'DROP DATABASE IF EXISTS `{self.db_name}`' | mysql -p{os.getenv("SECRET_KEY")};
+                  echo 'CREATE DATABASE IF NOT EXISTS `{self.db_name}`' | mysql -p{os.getenv("SECRET_KEY")};
+                  cat {self.fullpath} | mysql -p{os.getenv("SECRET_KEY")} {self.db_name};
+                  """,
+                  "Delete": f"""
+                  echo 'DROP DATABASE IF EXISTS `{self.db_name}`' | mysql -p{os.getenv("SECRET_KEY")};"""
+                  },
+              "postgresql": {
+                  "Create": f"""
+                  echo 'CREATE DATABASE {self.db_name}' | psql;
+                  psql -d {self.db_name} -f {self.fullpath};
+                  """,
+                  "Delete": f"""
+                  echo 'DROP DATABASE {self.db_name}' | psql;"""
+                  }
         }
         return engines[fmt][action]
