@@ -61,9 +61,6 @@ class MyUser():
             temp_folder = os.path.join(central_db_path, "temp")
             if os.path.exists(temp_folder):
                 subprocess.run(f'rm -r {temp_folder}', check=True, shell=True)
-            # print("*************************")
-            # print(returned_fmt)
-            # print("*************************")
             if not returned_fmt:
                 return False
             new_data = {returned_fmt:

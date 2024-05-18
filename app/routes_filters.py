@@ -105,12 +105,8 @@ def table_query(columns):
         tables = session['tables']
         tables = list([tables[1], tables[0]])
 
-    # inst = Filter(current_user.id, session.get('database'),
-    #               session['tables'], (eval(session.get('columns'))))
     inst = Filter(current_user.id, session.get('database'),
                   tables, eval(columns))
-    # headers = inst.table_headers(tables,
-    #                              eval(session.get('columns')))
     headers = inst.table_headers(tables,
                                  eval(columns))
     condition_keys = eval(request.form.get('action'))  # eval converts to list
