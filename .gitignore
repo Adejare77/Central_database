@@ -5,3 +5,5 @@ new-venv/
 *.pyc
 app.db
 main.py
+backup
+__pycache__

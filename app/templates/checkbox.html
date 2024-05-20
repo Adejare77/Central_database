@@ -5,7 +5,7 @@
   <div class="query-container-1">
     <form action="{{ route }}" method="POST">
       <dl>
-        <dt>Please check one or more of the following</dt>
+        <dt>{{ description }}</dt>
         {% for item in data %}
         <dd><input class="checkboxes" type="checkbox" value="{{ item }}" name="{{ name }}">
             <label>{{ item }}</label>

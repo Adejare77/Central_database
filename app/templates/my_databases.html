@@ -1,0 +1,26 @@
+{% extends "base.html" %}
+
+{% block content %}
+  <h1>My Databases</h1>
+  <table class="table">
+    <thead>
+      <tr>
+        <th>Filename</th>
+        <th>Upload Date</th>
+        <th>Size</th>
+      </tr>
+    </thead>
+    <tbody>
+      {% for database in databases %}
+        <tr>
+          <td>{{ database.filename }}</td>
+          <td>{{ database.upload_date }}</td>
+        </tr>
+      {% endfor %}
+    </tbody>
+  </table>
+{% endblock %}
+
+{% block scripts %}
+  <!-- Add any additional scripts here if needed -->
+{% endblock %}

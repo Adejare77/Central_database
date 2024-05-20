@@ -4,28 +4,23 @@
 <div class="query-block">
     <div  class="query-wrapper">
     {% if title == "Create Database" %}
-    
-    <form action="{{ url_for('submit_database_form') }}" method="post" enctype="multipart/form-data" class="query-container-1">
-            <h1>Create A New Database</h1>
-            <div class="form-field">
+    <!-- <br> -->
+    <h1>Create A New Database</h1>
+    <h3> Warning: Choose a Non-Existing Database Name, Otherwise existing database name will be replaced</h3>
+    <form action="{{ url_for('submit_database_form') }}" method="post" enctype="multipart/form-data">
+        <label>Select a Database Name: <input type="text" name="filename" /></label>
+        <br>
+        <label>Select a sqldump file: <input type="file" name="uploaded_file" /></label>
+        <br>
+        <div class="form-field">
 
-                <label>Select a Database Name: <input type="text" name="filename"/></label> 
-            </div>
-            <!-- <br> -->
-            <div class="form-field">
-
-                <label>Select a sqldump file: <input type="file" name="uploaded_file" /></label>
-            </div>
-            <div class="form-field">
-
-                <label for="db_engine">Database format:</label>
-                <select id="db_engine" name="db_engine" required>
-                    {% for engine in database_engines %}
-                    <option value="{{ engine }}">{{ engine }}</option>
-                    {% endfor %}
-                </select>
-            </div>
-            <!-- <br> -->
+            <label for="db_engine">Database format:</label>
+            <select id="db_engine" name="db_engine" required>
+                {% for engine in database_engines %}
+                <option value="{{ engine }}">{{ engine }}</option>
+                {% endfor %}
+            </select>
+        </div>
             <!-- Database Engine Selection -->
             <!-- <br> -->
             <!-- Submit Button -->
