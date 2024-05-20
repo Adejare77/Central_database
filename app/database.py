@@ -2,7 +2,7 @@
 """Central_database Database"""
 from sqlalchemy import create_engine, MetaData
 from sqlalchemy.orm import sessionmaker
-from sqlalchemy.exc import OperationalError
+from sqlalchemy.exc import OperationalError, NoResultFound
 from app.central_db_tables import UserDatabase
 from os import getenv
 import subprocess
@@ -38,9 +38,12 @@ class Database:
     def get_fmt_db_dt(self) -> list:
         """Retrieves formatted database details based on user ID"""
         session = self.Session()
-        fmt_db_dt = session.query(UserDatabase).filter_by(
-            id=self.id).one().db_list
-        if not fmt_db_dt:
+        try:
+            fmt_db_dt = session.query(UserDatabase).filter_by(
+                id=self.id).one().db_list
+            if not fmt_db_dt.db_list:
+                return []
+        except NoResultFound:
             session.close()
             return None
         fmt_eng_dt = []
@@ -56,8 +59,15 @@ class Database:
         Retrieves <{formatted: [[databases]]}> dictionary based on user ID.
         """
         session = self.Session()
-        fmt_db_list = session.query(UserDatabase).filter_by(
-            id=self.id).one().db_list
+        try:
+            fmt_db_list = session.query(UserDatabase).filter_by(
+                id=self.id).one().db_list
+        except NoResultFound:
+            print("======================================")
+            print("** USER DOES NOT EXISTS **")
+            print("======================================")
+            return None
+
         if not fmt_db_list:
             session.close()
             return None
@@ -74,6 +84,8 @@ class Database:
     def get_db_list(self) -> list:
         """Retrieves a list of databases accessible to the user."""
         db_list = self.fmt_db_list
+        if not self.fmt_db_list:
+            return None
         if db_list:
             db_list = [db for db in
                        [db_list for db_list in self.fmt_db_list.values()]]
