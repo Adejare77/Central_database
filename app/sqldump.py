@@ -67,6 +67,7 @@ class DumpCleanUp:
         """
         rdbms = {
             "MySQL": "mysql+mysqldb",
+            "MariaDB": "mysql+mysqldb",
             "PostgreSQL": "postgresql"
             }
         if db_engine:

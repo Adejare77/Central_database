@@ -4,7 +4,6 @@ from sqlalchemy import create_engine, MetaData
 from sqlalchemy.orm import sessionmaker
 from sqlalchemy.exc import OperationalError
 from app.central_db_tables import UserDatabase
-from sqlalchemy.ext.automap import automap_base
 from os import getenv
 import subprocess
 
@@ -39,13 +38,13 @@ class Database:
     def get_fmt_db_dt(self) -> list:
         """Retrieves formatted database details based on user ID"""
         session = self.Session()
-        fmt_db_dt = session.query(UserDatabase.db_list).filter_by(
-            id=self.id).one()
-        if not fmt_db_dt[0]:
+        fmt_db_dt = session.query(UserDatabase).filter_by(
+            id=self.id).one().db_list
+        if not fmt_db_dt:
             session.close()
             return None
         fmt_eng_dt = []
-        for key, val in fmt_db_dt.db_list.items():
+        for key, val in fmt_db_dt.items():
             for items in val:
                 fmt_eng_dt.append([items[0], database[key], items[1]])
         session.close()
@@ -200,7 +199,6 @@ class CreateClassTable(Database):
         except OperationalError:
             print("==================================================")
             print("** COULD NOT CONNECT TO THE SELECTED DATABASE **")
-            print(url)
             print("==================================================")
             return
         self.Session = sessionmaker(bind=self.engine)

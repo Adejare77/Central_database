@@ -26,7 +26,8 @@ class MyUser():
             username (_type_): The unique user's username
         """
         url = 'mysql+mysqldb://{}:{}@{}:3306/{}'.format(
-            'my_user', 'my_user_passwd', 'localhost', 'central_db')
+            os.getenv('USER'), os.getenv('SECRET_KEY'),
+            'localhost', 'central_db')
         self.id = id
         self.username = username
         self.engine = create_engine(url, pool_pre_ping=True)
