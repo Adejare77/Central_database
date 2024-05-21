@@ -57,9 +57,9 @@ class MyUser():
             db_name = self.username + "_" + filename
             uploaded_files.save(os.path.join(central_db_path,
                                              filename + ".sql"))
+            temp_folder = os.path.join(central_db_path, "temp")
             returned_fmt = DumpCleanUp(filename, db_name,
                                        central_db_path).dump_data(db_engine)
-            temp_folder = os.path.join(central_db_path, "temp")
             if os.path.exists(temp_folder):
                 subprocess.run(f'rm -r {temp_folder}', check=True, shell=True)
             if not returned_fmt:

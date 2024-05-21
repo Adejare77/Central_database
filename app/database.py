@@ -2,7 +2,7 @@
 """Central_database Database"""
 from sqlalchemy import create_engine, MetaData
 from sqlalchemy.orm import sessionmaker
-from sqlalchemy.exc import OperationalError
+from sqlalchemy.exc import OperationalError, NoResultFound
 from app.central_db_tables import UserDatabase
 from os import getenv
 import subprocess
@@ -50,14 +50,34 @@ class Database:
         session.close()
         return fmt_eng_dt
 
+
     @property
     def get_fmt_db_list(self) -> dict:
         """
         Retrieves <{formatted: [[databases]]}> dictionary based on user ID.
         """
         session = self.Session()
-        fmt_db_list = session.query(UserDatabase).filter_by(
-            id=self.id).one().db_list
+        try:
+            fmt_db_list = session.query(UserDatabase).filter_by(
+                id=self.id).one().db_list
+        except NoResultFound:
+            print("======================================")
+            print("** USER DOES NOT EXISTS **")
+            print("======================================")
+            return None
+    @property
+    def get_fmt_db_list(self) -> dict:
+        """
+        Retrieves <{formatted: [[databases]]}> dictionary based on user ID.
+        """
+        session = self.Session()
+        try:
+            fmt_db_list = session.query(UserDatabase).filter_by(
+                id=self.id).one().db_list
+        except NoResultFound:
+            print("======================================")
+            print("** USER DOES NOT EXISTS **")
+            print("======================================")
         if not fmt_db_list:
             session.close()
             return None
@@ -139,7 +159,7 @@ class Database:
             "mysql+mysqldb": f"""
             echo 'DROP DATABASE IF EXISTS {db}' | mysql -p{getenv("SECRET_KEY")}""",
             "postgresql": f"""
-            echo 'DROP DATABASE IF EXISTS {db}' | psql;"""
+            echo 'DROP DATABASE IF EXISTS {db}' | psql -U {getenv("USER")} -d central_db;"""
         }
         return db_engine[fmt]
 
