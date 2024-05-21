@@ -17,7 +17,7 @@ class DumpCleanUp:
         self.filename = filename
         self.db_path = full_path
         self.db_name = db_name
-        self.copy_data
+        self.fullpath = self.copy_data
         self.cleanup
 
     @property
@@ -31,7 +31,9 @@ class DumpCleanUp:
             cp {self.db_path}/{self.filename}.sql {self.path}/{self.db_name}.sql
             """
             subprocess.run(command, shell=True, check=True)
-            self.fullpath = os.path.join(self.path, self.db_name + ".sql")
+            fullpath = os.path.join(self.path, self.db_name + ".sql")
+            return fullpath
+
         except Exception as e:
             print(f"** ERROR WHILE MAKING A COPY OF \
                   {self.db_name} TO TEMP FOLDER **")
@@ -56,6 +58,7 @@ class DumpCleanUp:
             sed -i 's/COMMIT[^;]*[;]*//g' {self.fullpath};
             """
             subprocess.run(commands, shell=True, check=True)
+
         except Exception as e:
             print("** FILE DOES NOT EXISTS **")
             return None
@@ -80,14 +83,14 @@ class DumpCleanUp:
                 print("******* SUBPROCESS ERROR **********")
                 print(e)
                 print("******* SUBPROCESS ERROR **********")
-                subprocess.run(self.db_engine(fmts, "Delete"),
+                subprocess.run(self.db_engine(rdbms[db_engine], "Delete"),
                                shell=True, check=True)
 
             except Exception as e:
                 print("******* EXCEPTION ERROR **********")
                 print(e)
                 print("******* EXCEPTION ERROR **********")
-                subprocess.run(self.db_engine(fmts, "Delete"),
+                subprocess.run(self.db_engine(rdbms[db_engine], "Delete"),
                                shell=True, check=True)
 
 
