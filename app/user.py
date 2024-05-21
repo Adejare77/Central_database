@@ -26,7 +26,8 @@ class MyUser():
             username (_type_): The unique user's username
         """
         url = 'mysql+mysqldb://{}:{}@{}:3306/{}'.format(
-            'my_user', 'my_user_passwd', 'localhost', 'central_db')
+            os.getenv('USER'), os.getenv('SECRET_KEY'),
+            'localhost', 'central_db')
         self.id = id
         self.username = username
         self.engine = create_engine(url, pool_pre_ping=True)
@@ -56,14 +57,11 @@ class MyUser():
             db_name = self.username + "_" + filename
             uploaded_files.save(os.path.join(central_db_path,
                                              filename + ".sql"))
+            temp_folder = os.path.join(central_db_path, "temp")
             returned_fmt = DumpCleanUp(filename, db_name,
                                        central_db_path).dump_data(db_engine)
-            temp_folder = os.path.join(central_db_path, "temp")
             if os.path.exists(temp_folder):
                 subprocess.run(f'rm -r {temp_folder}', check=True, shell=True)
-            # print("*************************")
-            # print(returned_fmt)
-            # print("*************************")
             if not returned_fmt:
                 return False
             new_data = {returned_fmt:

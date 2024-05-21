@@ -1,10 +1,9 @@
 #!/usr/bin/python3
 """Central_database Database"""
-from sqlalchemy import create_engine, text
+from sqlalchemy import create_engine, MetaData
 from sqlalchemy.orm import sessionmaker
-from sqlalchemy.exc import OperationalError
+from sqlalchemy.exc import OperationalError, NoResultFound
 from app.central_db_tables import UserDatabase
-from sqlalchemy.ext.automap import automap_base
 from os import getenv
 import subprocess
 
@@ -39,17 +38,18 @@ class Database:
     def get_fmt_db_dt(self) -> list:
         """Retrieves formatted database details based on user ID"""
         session = self.Session()
-        fmt_db_dt = session.query(UserDatabase.db_list).filter_by(
-            id=self.id).one()
-        if not fmt_db_dt[0]:
+        fmt_db_dt = session.query(UserDatabase).filter_by(
+            id=self.id).one().db_list
+        if not fmt_db_dt:
             session.close()
             return None
         fmt_eng_dt = []
-        for key, val in fmt_db_dt.db_list.items():
+        for key, val in fmt_db_dt.items():
             for items in val:
                 fmt_eng_dt.append([items[0], database[key], items[1]])
         session.close()
         return fmt_eng_dt
+
 
     @property
     def get_fmt_db_list(self) -> dict:
@@ -57,8 +57,27 @@ class Database:
         Retrieves <{formatted: [[databases]]}> dictionary based on user ID.
         """
         session = self.Session()
-        fmt_db_list = session.query(UserDatabase).filter_by(
-            id=self.id).one().db_list
+        try:
+            fmt_db_list = session.query(UserDatabase).filter_by(
+                id=self.id).one().db_list
+        except NoResultFound:
+            print("======================================")
+            print("** USER DOES NOT EXISTS **")
+            print("======================================")
+            return None
+    @property
+    def get_fmt_db_list(self) -> dict:
+        """
+        Retrieves <{formatted: [[databases]]}> dictionary based on user ID.
+        """
+        session = self.Session()
+        try:
+            fmt_db_list = session.query(UserDatabase).filter_by(
+                id=self.id).one().db_list
+        except NoResultFound:
+            print("======================================")
+            print("** USER DOES NOT EXISTS **")
+            print("======================================")
         if not fmt_db_list:
             session.close()
             return None
@@ -107,24 +126,6 @@ class Database:
         session.commit()
         session.close()
 
-    # def del_database(self, dbs):
-    #     """Deletes specified databases."""
-    #     if type(dbs) == str:
-    #         dbs = list([dbs])
-    #     url = Database.url
-    #     session = self.Session()
-    #     user = session.query(UserDatabase).filter_by(
-    #         id=self.id).one().username
-    #     engine = create_engine(url, pool_pre_ping=True)
-    #     with engine.connect() as connection:
-    #         for db in dbs:
-    #             dbase = user + "_" + db
-    #             query = f'DROP DATABASE IF EXISTS {dbase}'
-    #             connection.execute(text(query))
-    #             self.__del_central_database(db)
-    #     session.close()
-    #     engine.dispose()
-
     def get_db_fmt_only(self, db) -> str:
         """Retrieves only the format of a given database"""
         fmt_db_list = self.fmt_db_list
@@ -158,7 +159,7 @@ class Database:
             "mysql+mysqldb": f"""
             echo 'DROP DATABASE IF EXISTS {db}' | mysql -p{getenv("SECRET_KEY")}""",
             "postgresql": f"""
-            echo 'DROP DATABASE IF EXISTS {db}' | psql;"""
+            echo 'DROP DATABASE IF EXISTS {db}' | psql -U {getenv("USER")} -d central_db;"""
         }
         return db_engine[fmt]
 
@@ -218,7 +219,6 @@ class CreateClassTable(Database):
         except OperationalError:
             print("==================================================")
             print("** COULD NOT CONNECT TO THE SELECTED DATABASE **")
-            print(url)
             print("==================================================")
             return
         self.Session = sessionmaker(bind=self.engine)
@@ -240,11 +240,9 @@ class CreateClassTable(Database):
     @property
     def get_tbl_cls(self) -> dict:
         """automatically generates classes associated with to a DB using PK"""
-        Base = automap_base()
-        # Provides a list of tuples [(table_name, class)]
-        Base.prepare(self.engine, reflect=True)
-        # Give the list in dictionary format
-        table_cls_names = dict(Base.classes.items())
+        metadata = MetaData()
+        metadata.reflect(self.engine)
+        table_cls_names = dict(metadata.tables.items())
         self.engine.dispose()
         return table_cls_names
 
@@ -256,14 +254,16 @@ class CreateClassTable(Database):
 
     def get_tb_columns(self, tables=[]) -> list:
         """Return the columns available for given table(s) of a DB"""
+        if type(tables) != list:
+            tables = list([tables])
+
         tb_cls = self.tbl_cls
         # tb = [tb_cls[tbs] for tbs in tb_cls.keys() if tbs in tables]
         tb = [tb_cls[tbs] for tbs in tables]
         columns = []
         for _cls in tb:
-            tb_name = _cls.__table__
-            tb_cols = _cls.__table__.columns.keys()
-            columns.extend(f"{tb_name}.{tb_col}" for tb_col in tb_cols)
+            columns.extend(_cls.c)
+        columns = [f"{col}" for col in columns]
         return columns
 
     def del_table(self, tables=[]):
@@ -273,13 +273,8 @@ class CreateClassTable(Database):
         if type(tables) == str:
             tables = list([tables])
         for table in tables:
-            if not self.tbl_cls.get(table):
-                print("===============================")
-                print(f"{table} Doesn't Exist")
-                print("===============================")
-            else:
-                tb = self.tbl_cls[table]
-                tb.__table__.drop(self.engine)
+            tb = self.tbl_cls[table]
+            tb.drop(self.engine)
 
     def __del__(self):
         """Dispose Engine"""

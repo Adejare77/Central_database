@@ -180,6 +180,9 @@ def submit_database_form():
     uploaded_files = request.files.get('uploaded_file')
     filename = request.form.get("filename")
     db_list = Database(current_user.id).get_fmt_db_dt
+    print("****************************--------")
+    print(db_list)
+    print("****************************--------")
     for dbs in db_list:
         if filename in dbs:
             print("***** DATABASE ALREADY EXISTED *****")

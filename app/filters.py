@@ -56,50 +56,49 @@ class Filter(CreateClassTable):
     def __one_table(self, tbl_cls):
         """Returns from single selected table"""
         session = self.Session()
-        query = session.query(*tbl_cls).all()
+        data = []
+        for table in tbl_cls:
+            for col in self.columns:
+                if col.split(".")[1] in table.c and \
+                   col.split(".")[0] == table.name:
+                    col = col.split(".")[1]
+                    data.append(getattr(table.c, col))
+        query = session.query(*data).all()
+        session.close()
         data = []
         for row in query:
-            row_data = []
-            for col in self.columns:
-                column_data = getattr(row, col.split(".")[1])
-                row_data.append(column_data)
-            data.append(row_data)
-        session.close()
+            data.append(row)
         return data
 
     def __multiple_tables(self, tbl_clss, join_type, conditions):
         """Returns from multiple selected tables """
         session = self.Session()
         data = []
-        query = session.query(*tbl_clss)
+        for table in tbl_clss:
+            for col in self.columns:
+                if col.split(".")[1] in table.c and \
+                   col.split(".")[0] == table.name:
+                    col = col.split(".")[1]
+                    data.append(getattr(table.c, col))
+
+        query = session.query(*data)
+        session.close()
         for i in range(1, len(self.tb)):
             join_method = getattr(query, "join")
             value = False
             if join_type == "left join" or join_type == "right join":
                 value = True
-            # where conditions e.g [["states.id", "cities.id"],
-            # ["amenities.id", "places.amenity_id"]].
-            # e.g ["states.id". "cities.state_id"]
             condition = conditions[i - 1]
-            left = getattr(tbl_clss[i-1], condition[0].split(".")[1])
-            right = getattr(tbl_clss[i], condition[1].split(".")[1])
+            left = getattr(tbl_clss[i-1].c, condition[0].split(".")[1])
+            right = getattr(tbl_clss[i].c, condition[1].split(".")[1])
             query = join_method(tbl_clss[i], left == right, isouter=value)
 
         query = query.all()
+        result = []
         for row in query:
-            row_data = []
-            for each_table in row:
-                if each_table:
-                    for col in self.columns:
-                        if col.split(".")[0] == each_table.__table__.name:
-                            column_data = getattr(
-                                each_table, col.split(".")[1])
-                            row_data.append(column_data)
-                else:
-                    row_data.append("-")
-            data.append(row_data)
-        session.close()
-        return data
+            result.append(row)
+
+        return result
 
     def del_data(self, column=None, value=None):
         """Deletes a row in the selected DB"""

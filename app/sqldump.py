@@ -67,6 +67,7 @@ class DumpCleanUp:
         """
         rdbms = {
             "MySQL": "mysql+mysqldb",
+            "MariaDB": "mysql+mysqldb",
             "PostgreSQL": "postgresql"
             }
         if db_engine:
@@ -127,11 +128,11 @@ class DumpCleanUp:
                   },
               "postgresql": {
                   "Create": f"""
-                  echo 'CREATE DATABASE {self.db_name}' | psql;
-                  psql -d {self.db_name} -f {self.fullpath};
+                  echo 'CREATE DATABASE {self.db_name}' | psql -U {os.getenv("USER")} -d central_db;
+                  psql -U {os.getenv("USER")} -d {self.db_name} -f {self.fullpath};
                   """,
                   "Delete": f"""
-                  echo 'DROP DATABASE {self.db_name}' | psql;"""
+                  echo 'DROP DATABASE {self.db_name}' | psql -U {os.getenv("USER")} -d central_db;"""
                   }
         }
         return engines[fmt][action]
