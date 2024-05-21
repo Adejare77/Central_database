@@ -179,10 +179,8 @@ def submit_database_form():
     """handles the uploaded sqldump file once it has been uploaded"""
     uploaded_files = request.files.get('uploaded_file')
     filename = request.form.get("filename")
-    db_list = Database(current_user.id).get_fmt_db_dt
-    print("****************************--------")
-    print(db_list)
-    print("****************************--------")
+    # db_list = Database(current_user.id).get_fmt_db_dt
+    db_list = Database(current_user.id).get_db_list
     for dbs in db_list:
         if filename in dbs:
             print("***** DATABASE ALREADY EXISTED *****")

@@ -78,6 +78,7 @@ class Database:
             print("======================================")
             print("** USER DOES NOT EXISTS **")
             print("======================================")
+            return None
         if not fmt_db_list:
             session.close()
             return None
@@ -99,7 +100,7 @@ class Database:
                        [db_list for db_list in self.fmt_db_list.values()]]
             db_list = [db for dbs in self.fmt_db_list.values() for db in dbs]
             return db_list
-        return None
+        return []
 
     def upload_data(self, **kwargs) -> list:
         """Uploads data to the specified database"""
