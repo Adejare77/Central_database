@@ -143,7 +143,11 @@ class DumpCleanUp:
                   mkdir -p {sqlite_path}/{username};
                   sqlite3 {sqlite_path}/{username}/{filename}.db < {self.fullpath};
                   """,
-                  "Delete": shutil.rmtree(f"{sqlite_path}/{username}/{filename}.db", ignore_errors=True)
+                  "Delete": f"""
+                  if [ -e "{sqlite_path}/{username}/{filename}.db" ]; then
+                  rm -r {sqlite_path}/{username}/{filename}.db;
+                  fi
+                """
                   }
         }
         return engines[fmt][action]

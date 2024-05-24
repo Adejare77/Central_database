@@ -13,7 +13,8 @@ from datetime import datetime, timezone
 from app.forms import EditProfileForm, ResetPasswordForm
 from app.forms import ResetPasswordRequestForm
 from app.email import send_password_reset_email
-from app.user import MyUser
+# from app.user import MyUser
+from app.central_db_tables import UserDatabase
 from app.database import Database, CreateClassTable
 
 
@@ -71,7 +72,7 @@ def register():
         user.set_password(form.password.data)
         db.session.add(user)
         db.session.commit()
-        MyUser(user.id, user.username).addUser()
+        UserDatabase(user.id, user.username).addUser()
         flash('Congratulations, you are now a registered user!')
         return redirect(url_for('login'))
     return render_template('register.html', title='Register',
@@ -187,7 +188,7 @@ def submit_database_form():
             Database(current_user.id).del_database(filename)
     db_engine = request.form.get("db_engine")
     db_engine = None if db_engine == "None" else db_engine
-    check = MyUser(current_user.id, current_user.username).check_folder(
+    check = UserDatabase(current_user.id, current_user.username).check_folder(
         uploaded_files, filename, db_engine)
     flash("File Successfully Uploaded") if check else flash(
         "Failed to Upload file; Upload file with right RDB format")
