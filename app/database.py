@@ -5,6 +5,7 @@ from sqlalchemy.orm import sessionmaker
 from sqlalchemy.exc import OperationalError, NoResultFound
 from app.central_db_tables import UserDatabase
 from os import getenv
+from app import sqlite_path
 import subprocess
 
 database = {
@@ -50,7 +51,6 @@ class Database:
         session.close()
         return fmt_eng_dt
 
-
     @property
     def get_fmt_db_list(self) -> dict:
         """
@@ -61,23 +61,8 @@ class Database:
             fmt_db_list = session.query(UserDatabase).filter_by(
                 id=self.id).one().db_list
         except NoResultFound:
-            print("======================================")
-            print("** USER DOES NOT EXISTS **")
-            print("======================================")
-            return None
-    @property
-    def get_fmt_db_list(self) -> dict:
-        """
-        Retrieves <{formatted: [[databases]]}> dictionary based on user ID.
-        """
-        session = self.Session()
-        try:
-            fmt_db_list = session.query(UserDatabase).filter_by(
-                id=self.id).one().db_list
-        except NoResultFound:
-            print("======================================")
-            print("** USER DOES NOT EXISTS **")
-            print("======================================")
+            error = "** USER DOES NOT EXISTS **"
+            print("========", error, "=========", sep="\n")
             return None
         if not fmt_db_list:
             session.close()
@@ -106,24 +91,22 @@ class Database:
         """Uploads data to the specified database"""
         session = self.Session()
         query = session.query(UserDatabase).filter_by(
-            id=self.id).one().db_list
+            id=self.id)
+        db_lists = query.one().db_list
         for key in kwargs.keys():
             key
-        if not query:
+        if not db_lists:
             kwargs[key] = list([kwargs[key]])
-            query = kwargs
+            db_lists = kwargs
 
         else:
-            if set(kwargs.keys()).issubset(query.keys()):
-                query[key].append(kwargs[key])
-                session.query(UserDatabase).filter_by(id=self.id).update(
-                    {UserDatabase.db_list: query})
+            if set(kwargs.keys()).issubset(db_lists.keys()):
+                db_lists[key].append(kwargs[key])
 
             else:
-                query[key] = list([kwargs[key]])
+                db_lists[key] = list([kwargs[key]])
 
-        session.query(UserDatabase).filter_by(id=self.id).update(
-            {UserDatabase.db_list: query})
+        query.update({UserDatabase.db_list: db_lists})
         session.commit()
         session.close()
 
@@ -139,56 +122,52 @@ class Database:
         if type(dbs) == str:
             dbs = list([dbs])
         session = self.Session()
-        user = session.query(UserDatabase).filter_by(
-            id=self.id).one().username
-        session.close()
+        self.query = session.query(UserDatabase).filter_by(
+            id=self.id)
+        self.user = self.query.one().username
         for db in dbs:
-            dbase = user + "_" + db
             fmt = self.get_db_fmt_only(db)
-            command = self.del_db_engine(fmt, dbase)
+            command = self.__del_db_engine(fmt, db)
             try:
                 subprocess.run(command, shell=True, check=True)
-                self.__del_central_database(db)
+                self.__del_central_database(fmt, db)
             except subprocess.CalledProcessError:
-                print("===================================")
-                print("** COULD NOT DELETE DATABASE **")
-                print("===================================")
+                error = "** COULD NOT DELETE DATABASE **"
+                print("========", error, "============", sep="\n")
                 return
+            except Exception as e:
+                print("========", e, "============", sep="\n")
+            session.commit()
+        session.close()
 
-    def del_db_engine(self, fmt, db):
+    def __del_db_engine(self, fmt, db):
+        dbase = self.user + "_" + db
         db_engine = {
             "mysql+mysqldb": f"""
-            echo 'DROP DATABASE IF EXISTS {db}' | mysql -p{getenv("SECRET_KEY")}""",
+            echo 'DROP DATABASE IF EXISTS {dbase}' | mysql -p{getenv("SECRET_KEY")}""",
             "postgresql": f"""
-            echo 'DROP DATABASE IF EXISTS {db}' | psql -U {getenv("USER")} -d central_db;"""
+            echo 'DROP DATABASE IF EXISTS {dbase}' | psql -U {getenv("USER")} -d central_db;""",
+            "sqlite": f"""rm -r {sqlite_path}/{self.user}/{db}.db"""
         }
         return db_engine[fmt]
 
-    def __del_central_database(self, db):
+    def __del_central_database(self, fmt, db):
         """Deletes databases associated with a user."""
-        session = self.Session()
-        query = session.query(UserDatabase).filter_by(
-            id=self.id).one().db_list
-        if not query:
-            session.close()
+        db_lists = self.query.one().db_list
+        if not db_lists:
             return None
 
-        fmt_value = CreateClassTable(self.id, db).get_fmt_db
-        for fmt in fmt_value.keys():
-            key = fmt
-        for items in query[key]:
+        for items in db_lists[fmt]:
             if db in items:
-                query[key].remove(items)
-        session.query(UserDatabase).filter_by(id=self.id).update(
-            {UserDatabase.db_list: query})
-        session.commit()
-        session.close()
+                db_lists[fmt].remove(items)
+        self.query.update({UserDatabase.db_list: db_lists})
 
     def user(self) -> str:
         """Returns the current user username"""
         session = self.Session()
         user = session.query(UserDatabase).filter_by(
             id=self.id).one().username
+        session.close()
         return user
 
     def __del__(self):
@@ -204,23 +183,24 @@ class CreateClassTable(Database):
         super().__init__(id)
         self.db = db
         if not self.get_fmt_db:
-            print("=============================================")
-            print("** COULDN'T FIND OR CONNECT TO DATABASE **")
-            print("=============================================")
+            error = "** COULDN'T FIND OR CONNECT TO DATABASE **"
+            print("=========", error, "==========", sep="\n")
             return None
         for fmt in self.get_fmt_db.keys():
             self.fmt = fmt
         username = self.user()
         db = username + "_" + self.db
-        url = "{}://{}:{}@localhost/{}".\
-            format(self.fmt, getenv("USER"), getenv("SECRET_KEY"), db)
+        if self.fmt == 'sqlite':
+            url = f"sqlite:////{sqlite_path}/{username}/" + self.db + ".db"
+        else:
+            url = "{}://{}:{}@localhost/{}".\
+                format(self.fmt, getenv("USER"), getenv("SECRET_KEY"), db)
         try:
             self.engine = create_engine(url, pool_pre_ping=True)
             self.engine.connect()
         except OperationalError:
-            print("==================================================")
-            print("** COULD NOT CONNECT TO THE SELECTED DATABASE **")
-            print("==================================================")
+            error = "** COULD NOT CONNECT TO THE SELECTED DATABASE **"
+            print("==========", error, "============", sep="\n")
             return
         self.Session = sessionmaker(bind=self.engine)
         self.tbl_cls = self.get_tbl_cls
@@ -259,7 +239,6 @@ class CreateClassTable(Database):
             tables = list([tables])
 
         tb_cls = self.tbl_cls
-        # tb = [tb_cls[tbs] for tbs in tb_cls.keys() if tbs in tables]
         tb = [tb_cls[tbs] for tbs in tables]
         columns = []
         for _cls in tb:

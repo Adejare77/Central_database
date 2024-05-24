@@ -8,6 +8,7 @@ from app.database import Database
 from sqlalchemy.orm import sessionmaker
 from sqlalchemy import create_engine
 import os
+from app import users_path
 import subprocess
 from app.sqldump import DumpCleanUp
 from datetime import date
@@ -51,8 +52,7 @@ class MyUser():
     def check_folder(self, uploaded_files, filename, db_engine=None):
         """ checks if the sqldump file will be succesfully uploaded"""
         try:
-            home = os.path.expanduser("~/Desktop")
-            central_db_path = os.path.join(home, "central_db", self.username)
+            central_db_path = os.path.join(users_path, self.username)
             os.makedirs(central_db_path, exist_ok=True)
             db_name = self.username + "_" + filename
             uploaded_files.save(os.path.join(central_db_path,

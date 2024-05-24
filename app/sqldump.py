@@ -2,6 +2,8 @@
 """Cleaning sqldump files"""
 import os
 import subprocess
+import shutil
+from app import sqlite_path
 
 
 class DumpCleanUp:
@@ -71,7 +73,8 @@ class DumpCleanUp:
         rdbms = {
             "MySQL": "mysql+mysqldb",
             "MariaDB": "mysql+mysqldb",
-            "PostgreSQL": "postgresql"
+            "PostgreSQL": "postgresql",
+            "SQLite": "sqlite"
             }
         if db_engine:
             try:
@@ -80,16 +83,14 @@ class DumpCleanUp:
                     capture_output=True, text=True)
                 return rdbms[db_engine]
             except subprocess.CalledProcessError as e:
-                print("******* SUBPROCESS ERROR **********")
-                print(e)
-                print("******* SUBPROCESS ERROR **********")
+                error = "** SUBPROCESS ERROR **"
+                print("===========", error, "============")
                 subprocess.run(self.db_engine(rdbms[db_engine], "Delete"),
                                shell=True, check=True)
 
             except Exception as e:
-                print("******* EXCEPTION ERROR **********")
-                print(e)
-                print("******* EXCEPTION ERROR **********")
+                error = "** EXCEPTION ERROR  **"
+                print("===========", error, "============")
                 subprocess.run(self.db_engine(rdbms[db_engine], "Delete"),
                                shell=True, check=True)
 
@@ -104,21 +105,21 @@ class DumpCleanUp:
                     capture_output=True, text=True)
                 return fmts
             except subprocess.CalledProcessError as e:
-                print("******* SUBPROCESS ERROR **********")
-                print(e)
-                print("******* SUBPROCESS ERROR **********")
+                error = "** SUBPROCESS ERROR **"
+                print("===========", error, "============")
                 subprocess.run(self.db_engine(fmts, "Delete"),
                                shell=True, check=True)
 
             except Exception as e:
-                print("******* EXCEPTION ERROR **********")
-                print(e)
-                print("******* EXCEPTION ERROR **********")
+                error = "** EXCEPTION ERROR  **"
+                print("===========", error, "============")
                 subprocess.run(self.db_engine(fmts, "Delete"),
                                shell=True, check=True)
         return None
 
     def db_engine(self, fmt, action):
+        filename = self.db_name[self.db_name.find("_")+1:]
+        username = self.db_name[: self.db_name.find("_")]
         engines = {
               "mysql+mysqldb": {
                   "Create": f"""
@@ -136,6 +137,13 @@ class DumpCleanUp:
                   """,
                   "Delete": f"""
                   echo 'DROP DATABASE {self.db_name}' | psql -U {os.getenv("USER")} -d central_db;"""
+                  },
+              "sqlite": {
+                  "Create": f"""
+                  mkdir -p {sqlite_path}/{username};
+                  sqlite3 {sqlite_path}/{username}/{filename}.db < {self.fullpath};
+                  """,
+                  "Delete": shutil.rmtree(f"{sqlite_path}/{username}/{filename}.db", ignore_errors=True)
                   }
         }
         return engines[fmt][action]

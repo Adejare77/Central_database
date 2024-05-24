@@ -150,7 +150,7 @@ def reset_password(token):
 @login_required
 def upload_database():
     """Handles the form where sqldump file is uploaded"""
-    database_engines = [None, 'MySQL', 'PostgreSQL', 'MariaDB']
+    database_engines = [None, 'MySQL', 'PostgreSQL', 'MariaDB', 'SQLite']
     return render_template('database.html', title='Create Database',
                            database_engines=database_engines)
 
