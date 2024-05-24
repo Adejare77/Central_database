@@ -1,0 +1,265 @@
+@import url('https://fonts.googleapis.com/css2?family=Fjalla+One&family=Nunito:ital,wght@0,200..1000;1,200..1000&display=swap');
+
+*{
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+    font-family: Nunito, sans-serif;
+    text-decoration: none;
+}
+
+#intro{
+    height: 100vh;
+    /* width: 1150px;  */
+    width: 100%;
+    background-color: rgba(2, 17, 30, 0.187);
+    background-image: url(../images/globe.jpg);
+    background-size: cover;
+    background-blend-mode: multiply;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: flex-start;
+}
+
+
+nav{
+    background-color: rgb(1, 1, 1);
+    /* width: 1150px; */
+    width: 100%;
+    display: flex;
+    justify-content: flex-end;
+    align-items: flex-start;
+    gap: 30px;
+}
+
+nav a{
+    text-decoration: none;
+    color: rgb(200,164,91);
+    font-family: "Fjalla One";
+    font-size: x-large;
+    margin: 0.5rem;
+    padding: 0.5rem;
+    transition: 0.2s;
+
+}
+
+nav a:hover{
+    color: rgb(200,164,91);
+    border-bottom: 0.1rem solid rgb(202,164,91);
+    padding: 0.25rem;
+}
+
+section{
+    padding: 2rem;
+}
+
+
+.main-text{
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    justify-content: space-between;
+    gap:  80px;
+}
+
+.main-text div{
+    color: rgb(200, 164, 91);
+    font-family: "Fjalla One", sans-serif;
+}
+
+.main-text .txt-1{
+    font-size: 6vw;
+    font-weight: 800;
+}
+
+.main-text .txt-2{
+    font-size: xx-large;
+}
+#features{
+    height: 250vh;
+    width: 100%;
+    background-image: linear-gradient(rgb(0,14,30), rgb(15, 27, 51), rgb(38,54,81));
+    box-shadow: 0 -5px 15px -15px rgb(38,54,81);
+    display: flex;
+    flex-direction: column;
+    justify-content: center; 
+    gap: 2rem;
+      
+}
+
+#features .heading {
+font-family: "Fjalla One";
+text-align: center;
+color: rgb(200,164,91);
+font-weight: 700;
+font-size: 4rem;
+padding-bottom: 3rem;
+text-transform: uppercase;
+margin-top: 30px;
+}
+
+
+#features .row{
+    display: flex;
+    align-items: center;
+    /* background-color: #f9fafbf5; */
+    flex-wrap: wrap;
+    /* border: solid 2px rgb(5, 4, 64); */
+    /* margin: 0 0 2.5rem 0; */
+    padding: 2rem;
+    /* border-radius: 10px; */
+ }
+
+
+ #features .row .image {
+    flex: 1 1 25rem;
+ }
+ 
+ #features .row .image img {
+     width: 100%;
+     border-radius: 20px;
+     transition: 0.2s;
+     z-index: -1;
+    }
+
+#features .row .image img:hover {
+    width: 105%;
+    border: 1px solid lightblue;
+}  
+    
+#features .row .content {
+    flex: 1 1 25rem;
+    padding: 2rem;
+}
+
+#features .row .content p{
+    font-family: "Fjalla One";
+    font-size: 1.8rem;
+    padding: 1rem 0;
+    /* color: rgb(20,34,60); */
+    color: rgb(200,164,91);
+    line-height: 1.8;
+    font-weight: 400;
+}
+
+#about{
+    height: 150vh;
+    width: 100%;
+    background-image: linear-gradient(rgba(38, 54, 81, 1), rgba(18, 24, 35, 0.763), rgba(18, 24, 35, 0) );
+    box-shadow: 0 -5px 15px -15px rgba(0, 14, 30, 1);
+    display: flex;
+    flex-direction: column;
+    justify-content: center; 
+
+}
+
+ #about .heading{
+     font-family: "Fjalla One";
+     text-align: center;
+     /* color: #cccccc; */
+     color: rgb(20,34,60);
+     font-size: 4rem;
+     padding-bottom: 3rem;
+     text-transform: uppercase;
+     font-weight: 700;
+     margin-top: 30px;
+}
+    
+#about .heading span{
+    font-family: "Fjalla One";
+    /* color: rgb(202,182,141); */
+    color: rgb(149 115 45);
+    font-weight: 700;
+ }
+
+ #about .row{
+    display: flex;
+    align-items: center;
+    /* background-color: rgb(20,34,60); */
+    flex-wrap: wrap;
+    /* border: solid 2px rgb(5, 4, 64); */
+    margin: 0 0 2.5rem 0;
+    padding: 2rem;
+    /* border-radius: 10px; */
+
+ }
+
+
+ #about .row .image {
+    flex: 1 1 25rem;
+ }
+ 
+ #about .row .image img {
+     width: 100%;
+     border-radius: 20px;
+    }
+    
+#about .row .content {
+    flex: 1 1 25rem;
+    padding: 2rem;
+}
+
+#about .row .content p{
+    font-size: 1.5rem;
+    padding: 1rem 0;
+    color: rgb(218, 205, 155);
+    line-height: 1.8;
+    font-weight: 600;
+
+}
+
+.contributors{
+    /* background-color: rgb(6 30 55); */
+    backdrop-filter: blur(2px);
+    box-shadow: 0px 0px 50px 30px rgba(6, 30, 55, 0.43);
+    width: 102.5%;
+    align-self: center;
+    /* border: solid 2px rgb(5, 4, 64); */
+    margin-top: 30px;
+    border-radius: 20px;
+
+}
+
+.contributors .heading{
+    color: rgb(20,34,60);
+}
+
+.contributors .heading span{
+    color: rgb(105 77 20 / 74%);
+
+}
+
+#about .members{
+    display: flex;
+    justify-content: space-around;
+
+}
+
+#about .members li{
+    display: inline-flex;
+
+}
+
+#about  a{
+    text-decoration: none;
+    /* color: #cccccc; */
+    color: rgb(20,34,60);
+    font-size: x-large;
+    /* margin: 0 4px; */
+    padding: 0.5rem;
+    transition: 0.2s;
+}
+
+#about a:hover{
+    color:  rgb(20,34,60);;
+    /* border-bottom: 0.1rem solid  rgb(20,34,60); */
+    padding: 0.25rem;
+    /* margin: 0 4px; */
+}
+
+
+
+.repo-link{
+    text-align: center;
+}
