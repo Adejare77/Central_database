@@ -1,0 +1,104 @@
+/* SERVES UPLOAD PAGES AND  QUERY PAGES */
+.query-block{
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    flex-direction: column;
+}
+
+.query-wrapper{
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    color: #f4f4f4;
+}
+
+.query-container-1{
+    /* width: 100%; */
+    height: 600px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    flex-direction: column;
+    gap: 20px;
+    width: 1003px;
+    padding: 50px;
+    /* border: 2.5px solid darkgray; */
+    border-radius: 25px;
+    background-color: rgba(0, 0, 0, 0.466);
+    backdrop-filter: blur(2px);
+    box-shadow: 0px 0px 50px 30px rgba(33, 36, 35, 0.43);
+    color: #f4f4f4;
+}
+
+.query-container-1 .btn-create{
+    background-color: rgb(167,190,211);
+    border: 0.5px solid #f9f9f9d7;
+}
+.query-container-1  .btn-create a{
+    text-decoration: none;
+    color: #292626;
+    font-weight: 600;
+
+}
+
+.form-field select{
+    width: 100%;
+    border: none;
+    background: rgba(255, 255, 255, 0.1);
+    border-radius: 7.5px;
+    color: #f4f4f4;
+    font-family: 'Noto Sans', sans-serif;
+    font-weight: 400;
+}
+
+.form-field label{
+    font-size: 1.2rem;
+}
+
+select option{
+    color: black;
+}
+
+dl dt{
+    font-size: 1.5rem;
+}
+dd label{
+    font-size: 1.3rem;
+}
+
+.form-field input:focus, .form-field textarea:focus{
+    outline: solid 2px rgba(163, 194, 235, 0.466);
+    
+}
+
+/* FOR QUERY RESULTS(data.html) */
+.result-view{
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+    justify-content: center;
+    align-items: center;
+}
+
+.result-view .table{
+    border: 0.025rem solid gray;
+
+}
+
+.result-view .table-cell{
+    border-right: 0.025rem solid gray;
+    border-top-right-radius: 30;
+}
+
+.result-view .nav-back{
+    width: 80%;
+    display: flex;
+    justify-content: flex-end;
+    align-items: center;
+}
+
+.result-view .table{
+    width: 80%;
+}

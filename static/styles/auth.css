@@ -1,0 +1,169 @@
+/* SERVES SIGNUP, LOGIN, AND PASSWORD RECOVERY FORMS */
+.auth-block{
+    /* background-color: rgb(227, 240, 240); */
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    flex-direction: column;
+
+}
+
+h1, h2 {
+    font-weight: 400;
+}
+.form-wrapper{
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    color: #f4f4f4;
+}
+
+/* .form-wrapper > p{
+    margin-top: 10px;
+} */
+
+.forgot-password{
+    display: block;
+}
+
+.forgot-password, .forgot-password a{
+    margin-top: 10px;
+    font-family: 'Noto Sans', sans-serif;
+    font-size: 12px;
+    font-weight: 600;
+    font-style: normal;
+}
+
+
+.form-container {
+    
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    flex-direction: column;
+    gap: 20px;
+    width: 500px;
+    padding: 50px;
+    border: 2.5px solid darkgray;
+    border-radius: 25px;
+    background-color: rgba(0, 0, 0, 0.466);
+    backdrop-filter: blur(2px);
+    box-shadow: 0px 0px 50px 30px rgba(33, 36, 35, 0.43);
+    color: #f4f4f4;
+    
+}
+
+.extras{
+    display: flex;
+    gap: 10px;
+    width: 100%;
+    align-items: center;
+    justify-content: space-between;
+}
+
+.register a, .forgot-password a{
+    color: rgb(104, 179, 160);
+}
+
+.register, .register > a{
+    margin-top: 10px;
+    font-family: 'Noto Sans', sans-serif;
+    font-size: 12px;
+    font-weight: 400;
+    font-style: normal;
+}
+
+.form-field{
+    display: flex;
+    gap: 20px;
+    flex-direction: row;
+    justify-content: space-between;
+
+
+}
+
+/* .form-field > label{
+    width: 250px;
+} */
+
+ 
+.form-field input, .form-field textarea{
+    width: 100%;
+    border: none;
+    background: rgba(255, 255, 255, 0.1);
+    border-radius: 7.5px;
+    color: #f4f4f4;
+    font-family: 'Noto Sans', sans-serif;
+    font-weight: 400;
+}
+
+textarea{
+    max-width: 70%;
+}
+
+.form-field input:focus, .form-field textarea:focus{
+    outline: solid 2px rgba(163, 194, 235, 0.466);
+    
+}
+
+.field-tag{
+     width: 250px;
+     font-family: 'Noto Sans', sans-serif;
+     font-weight: 200;
+     font-style: normal;
+     font-size:medium;
+    }
+    
+    
+.remember-me{
+    display:flex;
+    /* border: solid; */
+    flex-direction: row;
+    justify-content:center;
+    align-items: center;
+    gap: 10px;
+    width: 200px;
+    font-family: 'Noto Sans', sans-serif;
+
+    /* align-content: flex-start; */
+}
+
+.remember-me > input {
+    width: 20px;
+}
+
+.remember-me > label{
+    color: grey;
+    font-size: 15px;
+    font-family: 'Saira Condensed', sans-serif;
+    /* font-family: 'Noto Sans', sans-serif; */
+    font-weight: 200;
+    font-style: normal;
+}
+
+#submit{
+    width: 150px;
+    font-family: 'Saira Condensed', sans-serif;
+    font-weight: 700;
+    background: #f4f4f4;
+    border: none;
+    border-radius: 10px;
+    color: rgb(22,84,144);
+}
+
+
+#password-request{
+    padding: 2rem;
+}
+
+#password-request-submit{
+    color: rgb(8, 55, 102);
+
+}
+
+.validation-alert{
+    font-size: x-small;
+    align-self: small;
+}
+
